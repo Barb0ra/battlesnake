@@ -1,20 +1,9 @@
 import random
 from tree_search import sample_best_minmax_action
 from state_generator import next_state_for_action, transform_state
-from state_reward import state_reward
 
 
 class TreeSearchPlayer():
-
-  def __init__(self):
-    self.rewards = {
-      'death': -1000,
-      'death_by_head_collision': -700,
-      'opponent_death': 100,
-      'distance_to_food_when_hungry': -5,
-      'distance_to_food_when_small': -1,
-      'board_domination': 3
-    }
 
   def info(self):
     return {

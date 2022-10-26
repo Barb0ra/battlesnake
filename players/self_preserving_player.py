@@ -1,6 +1,6 @@
 import random
 from state_generator import next_state_for_action, transform_state
-from state_reward import state_reward
+from state_reward_heuristic import state_reward
 
 
 class SelfPreservingPlayer():

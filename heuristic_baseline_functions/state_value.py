@@ -1,4 +1,4 @@
-from state_reward import state_reward
+from state_reward_heuristic import state_reward
 
 
 def state_value_deterministic(state, rewards):
