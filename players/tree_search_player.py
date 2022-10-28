@@ -1,6 +1,5 @@
 import random
-from battlesnake.tree_search import monte_carlo_tree_search
-from tree_search import sample_best_minmax_action
+from tree_search import monte_carlo_tree_search
 from state_generator import next_state_for_action, transform_state
 
 
