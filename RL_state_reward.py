@@ -2,7 +2,7 @@ import random
 import typing
 
 
-def state_reward(game_state, rewards):
+def state_reward(game_state):
     reward = 0
     # -1 if I die
     if is_dead(game_state, 0):
@@ -14,8 +14,8 @@ def state_reward(game_state, rewards):
     if len(game_state['snake_heads']) > 2:
         for snake_index in range(len(game_state['snake_heads'])):
             if snake_index != 0 and is_dead(game_state, snake_index):
-                reward += 0.3
-    return state_reward
+                reward += 0.05
+    return reward
 
 
 def is_dead(game_state, snake):
