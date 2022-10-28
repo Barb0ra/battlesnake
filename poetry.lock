@@ -83,6 +83,14 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "numpy"
+version = "1.23.4"
+description = "NumPy is the fundamental package for array computing with Python."
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[[package]]
 name = "werkzeug"
 version = "2.2.2"
 description = "The comprehensive WSGI web application library."
@@ -111,7 +119,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "24b8def6c7986d44d60683c827e1f338dda86457a9da4570a41adbdf7da1f517"
+content-hash = "bb4240e4347cf1ef4b405ab5f7ded14b91a89edcaae8cce99834cf61081604c4"
 
 [metadata.files]
 click = []
@@ -121,5 +129,6 @@ importlib-metadata = []
 itsdangerous = []
 jinja2 = []
 markupsafe = []
+numpy = []
 werkzeug = []
 zipp = []

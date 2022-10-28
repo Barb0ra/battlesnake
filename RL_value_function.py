@@ -2,7 +2,7 @@ import numpy as np
 
 from state_generator import next_state_for_action
 
-feature_weights = np.array([-1, 2, 2, -1])
+feature_weights = np.array([-1, 2, 3, -1])
 
 def get_value(state):
     feature_vector = compute_feature_vector(state)
@@ -120,6 +120,8 @@ def get_neighbors(current_node, game_state, snake_bodies):
     return neighbors
 
 def absolute_difference_in_length(state):
+    if len(state['snake_lengths']) == 1:
+      return 0
     return abs(state['snake_lengths'][0] - max(state['snake_lengths'][1:]) - 1)
 
 state = {'height': 11, 'width': 11, 'food': {(7, 4), (4, 6), (6, 9), (7, 3)}, 'hazards': {(4, 0), (5, 4), (5, 1), (5, 7), (9, 5), (5, 10), (10, 0), (10, 6), (0, 5), (1, 0), (10, 9), (6, 5), (4, 5), (5, 0), (5, 6), (5, 3), (5, 9), (9, 10), (0, 1), (10, 5), (0, 4), (0, 10), (1, 5), (6, 10), (3, 5), (4, 10), (9, 0), (5, 5), (0, 0), (10, 4), (10, 1), (0, 9), (0, 6), (10, 10), (1, 10), (6, 0), (7, 5)}, 'snake_heads': [(8, 4), (8, 6)], 'snake_bodies': [[(9, 4), (9, 3), (9, 2), (10, 2), (10, 3), (0, 3), (0, 2), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4), (3, 3), (3, 2), (4, 2), (5, 2), (6, 2), (7, 2), (7, 1), (7, 0), (7, 10), (8, 10), (8, 0), (8, 1)], [(8, 7), (8, 8), (8, 9), (9, 9), (9, 8), (10, 8), (0, 8), (1, 8), (2, 8), (2, 9), (2, 10), (2, 0), (2, 1), (3, 1), (3, 0), (3, 10), (3, 9), (4, 9)]], 'snake_lengths': [25, 19], 'snake_healths': [86, 84]}

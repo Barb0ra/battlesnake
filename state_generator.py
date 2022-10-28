@@ -35,32 +35,32 @@ def next_state_for_action(game_state, snake_index, action):
     return game_state
 
 def cleanup_state(game_state):    
-    dead_snakes = []
+    dead_snakes = set()
     snake_bodies = []
     for body in game_state['snake_bodies']:
         snake_bodies += body
     snake_heads = game_state['snake_heads']
     for snake_index, head in enumerate(snake_heads):
         if head in game_state['hazards'] or head in snake_bodies:
-            dead_snakes.append(snake_index)
+            dead_snakes.add(snake_index)
         
         #collision of snakes
         for snake_index2, head2 in enumerate(snake_heads):
             if snake_index != snake_index2 and head == head2:
                 if game_state['snake_lengths'][snake_index] <= game_state['snake_lengths'][snake_index2]:
-                    dead_snakes.append(snake_index)
+                    dead_snakes.add(snake_index)
                 if game_state['snake_lengths'][snake_index] >= game_state['snake_lengths'][snake_index2]:
-                    dead_snakes.append(snake_index2)
+                    dead_snakes.add(snake_index2)
         
         if game_state['snake_healths'][snake_index] <= 0:
-            dead_snakes.append(snake_index)
+            dead_snakes.add(snake_index)
 
         # remove eaten food from the game state
         if head in game_state['food']:
             game_state['food'].remove(head)
 
     # remove dead snakes from the game state
-    for snake_index in sorted(dead_snakes, reverse=True):
+    for snake_index in sorted(list(dead_snakes), reverse=True):
         game_state['snake_heads'].pop(snake_index)
         game_state['snake_bodies'].pop(snake_index)
         game_state['snake_lengths'].pop(snake_index)

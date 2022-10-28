@@ -34,7 +34,7 @@ def is_dead(game_state, snake):
             return True
 
     # death by collision with a snake head
-    for snake_index, snake_head in game_state['snake_heads']:
+    for snake_index, snake_head in enumerate(game_state['snake_heads']):
         if snake_index != snake and game_state['snake_heads'][snake] == snake_head:
             if game_state['snake_lengths'][snake] <= game_state['snake_lengths'][snake_index]:
                 return True
