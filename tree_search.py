@@ -103,7 +103,7 @@ def monte_carlo_tree_search(game_state):
     root_state = StateNode(game_state)
     max_depth = 6 - len(game_state['snake_heads'])
 #    max_depth = 1
-    each_depth_iteration = 3
+    each_depth_iteration = 2
     for i in range(each_depth_iteration):
         for depth in range(1, max_depth):
             # print action values
