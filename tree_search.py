@@ -102,6 +102,8 @@ def monte_carlo_tree_search(game_state):
     # iterative deepening
     root_state = StateNode(game_state)
     max_depth = 6 - len(game_state['snake_heads'])
+    # discounting factor
+    alpha = 0.9
 #    max_depth = 1
     each_depth_iteration = 2
     for i in range(each_depth_iteration):
@@ -112,7 +114,7 @@ def monte_carlo_tree_search(game_state):
             leaf_state, accumulated_reward = traverse(root_state, depth)
             simulation_result = get_simulation_result(
                 leaf_state) + accumulated_reward
-            backpropagate(leaf_state, simulation_result)
+            backpropagate(leaf_state, simulation_result, alpha)
     return root_state.get_max_action().action
 
 
@@ -134,11 +136,10 @@ def traverse(state, depth):
 # function for backpropagation
 
 
-def backpropagate(state, result):
+def backpropagate(state, result, alpha):
     state.update_value(result)
-    result -= state.reward
-
+    result = result * alpha
     if state.parent_action == None:
         return
-    backpropagate(state.parent_action.parent_state, result)
+    backpropagate(state.parent_action.parent_state, result, alpha)
 
