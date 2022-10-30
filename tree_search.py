@@ -105,9 +105,9 @@ def monte_carlo_tree_search(game_state):
     # discounting factor
     alpha = 0.9
 #    max_depth = 1
-    each_depth_iteration = 2
+    each_depth_iteration = 3
     for i in range(each_depth_iteration):
-        for depth in range(1, max_depth):
+        for depth in range(1, max_depth, -1):
             # print action values
             #          for action in root_state.actions:
             #              print(action.action, action.get_min_state().value, action.get_min_state().reward)
