@@ -40,5 +40,5 @@ def is_dead(game_state, snake):
             if game_state['snake_lengths'][snake] <= game_state['snake_lengths'][snake_index]:
                 return True, -0.8
                  
-    return False
+    return False, 0
 

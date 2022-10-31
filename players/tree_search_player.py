@@ -18,7 +18,7 @@ class TreeSearchPlayer():
     # move is called on every turn and returns your next move
     # Valid moves are "up", "down", "left", or "right"
 
-    print('turn ', game_state['turn'])
+#    print('turn ', game_state['turn'])
     game_state = transform_state(game_state)
 
     next_move = monte_carlo_tree_search(game_state)

@@ -54,8 +54,8 @@ class ActionNode:
         min = None
         min_state = None
         for state in self.states:
-            if min == None or state.value < min:
-                min = state.value
+            if min == None or state.value + state.reward < min:
+                min = state.value + state.reward
                 min_state = state
         return min_state
 
@@ -68,9 +68,9 @@ class StateNode:
     def __init__(self, game_state, parent=None):
         self.n_visited = 1
         self.parent_action = parent
-        self.value = get_value(game_state)
         self.reward = state_reward(game_state)*1000
-        self.terminal = is_dead(game_state, 0) or len(
+        self.value = get_value(game_state)
+        self.terminal = is_dead(game_state, 0)[0] or len(
             game_state['snake_heads']) <= 1
         self.game_state = cleanup_state(game_state)
         self.actions = []
@@ -101,20 +101,20 @@ class StateNode:
 def monte_carlo_tree_search(game_state):
     # iterative deepening
     root_state = StateNode(game_state)
-    max_depth = 6 - len(game_state['snake_heads'])
+    root_state.generate_actions()
+    max_depth = 7 - len(game_state['snake_heads'])
     # discounting factor
     alpha = 0.9
-#    max_depth = 1
-    each_depth_iteration = 3
+    each_depth_iteration = 2
     for i in range(each_depth_iteration):
-        for depth in range(1, max_depth, -1):
-            # print action values
-            #          for action in root_state.actions:
-            #              print(action.action, action.get_min_state().value, action.get_min_state().reward)
+        for depth in range(1, max_depth+1):
             leaf_state, accumulated_reward = traverse(root_state, depth)
             simulation_result = get_simulation_result(
                 leaf_state) + accumulated_reward
             backpropagate(leaf_state, simulation_result, alpha)
+    #print action values
+#    for action in root_state.actions:
+#        print(action.action, action.get_min_state().value, action.get_min_state().reward)
     return root_state.get_max_action().action
 
 
@@ -142,4 +142,13 @@ def backpropagate(state, result, alpha):
     if state.parent_action == None:
         return
     backpropagate(state.parent_action.parent_state, result, alpha)
+
+
+#state = {'height': 11, 'width': 11, 'food': {(4, 6), (2, 0), (1, 4), (7, 6), (9, 8), (2, 2), (9, 1)}, 'hazards': {(4, 0), (5, 4), (5, 1), (5, 7), (9, 5), (5, 10), (10, 0), (10, 6), (0, 5), (1, 0), (10, 9), (6, 5), (4, 5), (5, 0), (5, 6), (5, 3), (5, 9), (9, 10), (0, 1), (10, 5), (0, 4), (0, 10), (1, 5), (6, 10), (3, 5), (4, 10), (9, 0), (5, 5), (0, 0), (10, 4), (10, 1), (0, 9), (0, 6), (10, 10), (1, 10), (6, 0), (7, 5)}, 'snake_heads': [(7, 4), (4, 2)], 'snake_bodies': [[(8, 4), (8, 5), (8, 6), (9, 6), (9, 7), (10, 7), (0, 7), (1, 7), (1, 6), (2, 6), (2, 5), (2, 4)], [(3, 2), (3, 1), (3, 0), (3, 10), (2, 10), (2, 9), (1, 9), (1, 8), (2, 8), (3, 8), (3, 9), (4, 9), (4, 8), (5, 8), (6, 8), (6, 8)]], 'snake_lengths': [13, 17], 'snake_healths': [96, 100]}
+#state['snake_heads'][0], state['snake_heads'][1] = state['snake_heads'][1], state['snake_heads'][0]
+#state['snake_bodies'][0], state['snake_bodies'][1] = state['snake_bodies'][1], state['snake_bodies'][0]
+#state['snake_lengths'][0], state['snake_lengths'][1] = state['snake_lengths'][1], state['snake_lengths'][0]
+#state['snake_healths'][0], state['snake_healths'][1] = state['snake_healths'][1], state['snake_healths'][0]
+#
+#monte_carlo_tree_search(state)
 
