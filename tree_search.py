@@ -100,8 +100,7 @@ class StateNode:
         return max_action
 
 
-def monte_carlo_tree_search(game_state):
-    timeout_start = time.time()
+def monte_carlo_tree_search(game_state, timeout_start):
     timeout = 0.4
     # iterative deepening
     root_state = StateNode(game_state)
@@ -162,4 +161,4 @@ def backpropagate(state, result, alpha):
 #state['snake_lengths'][0], state['snake_lengths'][1] = state['snake_lengths'][1], state['snake_lengths'][0]
 #state['snake_healths'][0], state['snake_healths'][1] = state['snake_healths'][1], state['snake_healths'][0]
 ##
-#print(monte_carlo_tree_search(state))
+#print(monte_carlo_tree_search(state, time.time()))
