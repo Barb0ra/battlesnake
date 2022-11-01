@@ -26,7 +26,7 @@ class TreeSearchPlayer():
     timeout_start = time.time()
     print('turn ', game_state['turn'])
     game_state = transform_state(game_state)
-    self.serach_tree.set_root_state(game_state)
+    self.search_tree.set_root_state(game_state)
 
     threading.Thread(target=monte_carlo_tree_search, args=(self.search_tree, timeout_start)).start()
     # next_move = monte_carlo_tree_search(self.search_tree, timeout_start)
