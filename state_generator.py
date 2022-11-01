@@ -68,6 +68,28 @@ def cleanup_state(game_state):
 
     return game_state
 
+def get_likely_opponent_moves(game_state, snake_index):
+    # get opponent moves that are likely to happen (exclude self-destructing moves)
+    # snake bodies except tails because the tails may move
+    snake_bodies = []
+    for body in game_state['snake_bodies']:
+        snake_bodies += body[:-1]
+    likely_moves = []
+    possible_moves = ['up', 'down', 'left', 'right']
+    good_moves_left = True
+    for possible_move in possible_moves:
+        next_state = next_state_for_action(game_state, snake_index, possible_move)
+        # if the snake is in the wall
+        if next_state['snake_heads'][snake_index] not in next_state['hazards']:
+            # and not in the body of another snake except tail
+            if next_state['snake_heads'][snake_index] not in snake_bodies:
+                likely_moves.append(possible_move)
+                good_moves_left = True
+    if not good_moves_left:
+        likely_moves = possible_moves[0]
+    return likely_moves
+
+
 
 def transform_state(game_state):
     # transform game state to a flatter format

@@ -3,34 +3,19 @@ import copy
 import numpy as np
 from RL_value_function import get_value
 from RL_state_reward import is_dead, state_reward
-from state_generator import cleanup_state
-from state_generator import next_state_for_action
+from state_generator import get_likely_opponent_moves, cleanup_state, next_state_for_action
 import time
-
-
-def sample_best_minmax_action(game_state):
-    actions = ['up', 'down', 'left', 'right']
-    action_values = {}
-    state_values = []
-    for action in actions:
-        possible_states = generate_possible_states(game_state, action)
-        for state in possible_states:
-            # sample from the value function
-            state_values.append(get_value(state))
-        action_values[action] = min(state_values)
-
-    return action_values
-
 
 def generate_possible_states(game_state, my_action):
     # returns an array of possible states
-    actions = ['up', 'down', 'left', 'right']
     possible_states = []
     opponents_left = len(game_state['snake_heads']) - 1
     if opponents_left < 0:
         opponents_left = 0
-    move_combinations = itertools.combinations_with_replacement(
-        actions, opponents_left)
+    likely_opponent_moves = []
+    for opponent in range(opponents_left):
+        likely_opponent_moves.append(get_likely_opponent_moves(game_state, opponent + 1))
+    move_combinations = list(itertools.product(*likely_opponent_moves))
     # how the board changes when I move
     my_next_state = next_state_for_action(game_state, 0, my_action)
     # how the board changes when everyone else moves
@@ -158,10 +143,10 @@ def backpropagate(state, result, alpha):
     backpropagate(state.parent_action.parent_state, result, alpha)
 
 
-#state = {'height': 11, 'width': 11, 'food': {(6, 7), (9, 8), (6, 6), (1, 6), (1, 9)}, 'hazards': {(4, 0), (5, 4), (5, 1), (5, 7), (9, 5), (5, 10), (10, 0), (10, 6), (0, 5), (1, 0), (10, 9), (6, 5), (4, 5), (5, 0), (5, 6), (5, 3), (5, 9), (9, 10), (0, 1), (10, 5), (0, 4), (0, 10), (1, 5), (6, 10), (3, 5), (4, 10), (9, 0), (5, 5), (0, 0), (10, 4), (10, 1), (0, 9), (0, 6), (10, 10), (1, 10), (6, 0), (7, 5)}, 'snake_heads': [(2, 9), (2, 4)], 'snake_bodies': [[(2, 8), (3, 8), (4, 8), (5, 8), (6, 8), (6, 9), (7, 9), (7, 10)], [(3, 4), (4, 4), (4, 3), (4, 2), (5, 2), (6, 2), (6, 1), (7, 1), (7, 2), (7, 3)]], 'snake_lengths': [9, 11], 'snake_healths': [95, 90]}
-#state['snake_heads'][0], state['snake_heads'][1] = state['snake_heads'][1], state['snake_heads'][0]
-#state['snake_bodies'][0], state['snake_bodies'][1] = state['snake_bodies'][1], state['snake_bodies'][0]
-#state['snake_lengths'][0], state['snake_lengths'][1] = state['snake_lengths'][1], state['snake_lengths'][0]
-#state['snake_healths'][0], state['snake_healths'][1] = state['snake_healths'][1], state['snake_healths'][0]
-##
-#print(monte_carlo_tree_search(state, time.time()))
+state = {'height': 11, 'width': 11, 'food': {(6, 7), (9, 8), (6, 6), (1, 6), (1, 9)}, 'hazards': {(4, 0), (5, 4), (5, 1), (5, 7), (9, 5), (5, 10), (10, 0), (10, 6), (0, 5), (1, 0), (10, 9), (6, 5), (4, 5), (5, 0), (5, 6), (5, 3), (5, 9), (9, 10), (0, 1), (10, 5), (0, 4), (0, 10), (1, 5), (6, 10), (3, 5), (4, 10), (9, 0), (5, 5), (0, 0), (10, 4), (10, 1), (0, 9), (0, 6), (10, 10), (1, 10), (6, 0), (7, 5)}, 'snake_heads': [(2, 9), (2, 4)], 'snake_bodies': [[(2, 8), (3, 8), (4, 8), (5, 8), (6, 8), (6, 9), (7, 9), (7, 10)], [(3, 4), (4, 4), (4, 3), (4, 2), (5, 2), (6, 2), (6, 1), (7, 1), (7, 2), (7, 3)]], 'snake_lengths': [9, 11], 'snake_healths': [95, 90]}
+state['snake_heads'][0], state['snake_heads'][1] = state['snake_heads'][1], state['snake_heads'][0]
+state['snake_bodies'][0], state['snake_bodies'][1] = state['snake_bodies'][1], state['snake_bodies'][0]
+state['snake_lengths'][0], state['snake_lengths'][1] = state['snake_lengths'][1], state['snake_lengths'][0]
+state['snake_healths'][0], state['snake_healths'][1] = state['snake_healths'][1], state['snake_healths'][0]
+#
+print(monte_carlo_tree_search(state, time.time()))
