@@ -76,7 +76,7 @@ def get_likely_opponent_moves(game_state, snake_index):
         snake_bodies += body[:-1]
     likely_moves = []
     possible_moves = ['up', 'down', 'left', 'right']
-    good_moves_left = True
+    good_moves_left = False
     for possible_move in possible_moves:
         next_state = next_state_for_action(game_state, snake_index, possible_move)
         # if the snake is in the wall
@@ -86,7 +86,7 @@ def get_likely_opponent_moves(game_state, snake_index):
                 likely_moves.append(possible_move)
                 good_moves_left = True
     if not good_moves_left:
-        likely_moves = possible_moves[0]
+        likely_moves.append(possible_moves[0])
     return likely_moves
 
 

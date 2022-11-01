@@ -89,16 +89,16 @@ class StateNode:
 
 
 def monte_carlo_tree_search(game_state, timeout_start):
-    timeout = 0.3
+    timeout = 0.20
     # iterative deepening
     root_state = StateNode(game_state)
     root_state.generate_actions()
-    max_depth = 6 - len(game_state['snake_heads'])
+    #max_depth = 6 - len(game_state['snake_heads'])
     depth = 1
     iteration_counter = 0
     iterations_per_depth = 3
     # discounting factor
-    alpha = 0.6
+    alpha = 0.8
     while time.time() < timeout_start + timeout:
         leaf_state, accumulated_reward = traverse(root_state, depth)
         simulation_result = get_simulation_result(
@@ -111,7 +111,7 @@ def monte_carlo_tree_search(game_state, timeout_start):
         #for action in root_state.actions:
         #    print(action.action, action.get_min_state().value,
         #          action.get_min_state().reward)
-    #print(depth)
+    print(depth)
     return root_state.get_max_action().action
 
 
@@ -143,10 +143,10 @@ def backpropagate(state, result, alpha):
     backpropagate(state.parent_action.parent_state, result, alpha)
 
 
-state = {'height': 11, 'width': 11, 'food': {(6, 7), (9, 8), (6, 6), (1, 6), (1, 9)}, 'hazards': {(4, 0), (5, 4), (5, 1), (5, 7), (9, 5), (5, 10), (10, 0), (10, 6), (0, 5), (1, 0), (10, 9), (6, 5), (4, 5), (5, 0), (5, 6), (5, 3), (5, 9), (9, 10), (0, 1), (10, 5), (0, 4), (0, 10), (1, 5), (6, 10), (3, 5), (4, 10), (9, 0), (5, 5), (0, 0), (10, 4), (10, 1), (0, 9), (0, 6), (10, 10), (1, 10), (6, 0), (7, 5)}, 'snake_heads': [(2, 9), (2, 4)], 'snake_bodies': [[(2, 8), (3, 8), (4, 8), (5, 8), (6, 8), (6, 9), (7, 9), (7, 10)], [(3, 4), (4, 4), (4, 3), (4, 2), (5, 2), (6, 2), (6, 1), (7, 1), (7, 2), (7, 3)]], 'snake_lengths': [9, 11], 'snake_healths': [95, 90]}
-state['snake_heads'][0], state['snake_heads'][1] = state['snake_heads'][1], state['snake_heads'][0]
-state['snake_bodies'][0], state['snake_bodies'][1] = state['snake_bodies'][1], state['snake_bodies'][0]
-state['snake_lengths'][0], state['snake_lengths'][1] = state['snake_lengths'][1], state['snake_lengths'][0]
-state['snake_healths'][0], state['snake_healths'][1] = state['snake_healths'][1], state['snake_healths'][0]
+#state = {'height': 11, 'width': 11, 'food': {(6, 7), (9, 8), (6, 6), (1, 6), (1, 9)}, 'hazards': {(4, 0), (5, 4), (5, 1), (5, 7), (9, 5), (5, 10), (10, 0), (10, 6), (0, 5), (1, 0), (10, 9), (6, 5), (4, 5), (5, 0), (5, 6), (5, 3), (5, 9), (9, 10), (0, 1), (10, 5), (0, 4), (0, 10), (1, 5), (6, 10), (3, 5), (4, 10), (9, 0), (5, 5), (0, 0), (10, 4), (10, 1), (0, 9), (0, 6), (10, 10), (1, 10), (6, 0), (7, 5)}, 'snake_heads': [(2, 9), (2, 4)], 'snake_bodies': [[(2, 8), (3, 8), (4, 8), (5, 8), (6, 8), (6, 9), (7, 9), (7, 10)], [(3, 4), (4, 4), (4, 3), (4, 2), (5, 2), (6, 2), (6, 1), (7, 1), (7, 2), (7, 3)]], 'snake_lengths': [9, 11], 'snake_healths': [95, 90]}
+#state['snake_heads'][0], state['snake_heads'][1] = state['snake_heads'][1], state['snake_heads'][0]
+#state['snake_bodies'][0], state['snake_bodies'][1] = state['snake_bodies'][1], state['snake_bodies'][0]
+#state['snake_lengths'][0], state['snake_lengths'][1] = state['snake_lengths'][1], state['snake_lengths'][0]
+#state['snake_healths'][0], state['snake_healths'][1] = state['snake_healths'][1], state['snake_healths'][0]
 #
-print(monte_carlo_tree_search(state, time.time()))
+#print(monte_carlo_tree_search(state, time.time()))
