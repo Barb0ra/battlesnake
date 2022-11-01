@@ -70,9 +70,12 @@ class StateNode:
         self.n_visited = 1
         self.parent_action = parent
         self.reward = state_reward(game_state) * 1000
-        self.value = get_value(game_state)
         self.terminal = is_dead(game_state,
                                 0)[0] or (len(game_state['snake_heads']) <= 2 and is_dead(game_state, 1)[0])
+        if self.terminal:
+          self.value = 0
+        else:
+          self.value = get_value(game_state)
         self.game_state = cleanup_state(game_state)
         self.actions = []
 

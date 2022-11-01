@@ -10,7 +10,7 @@ def get_value(state):
     return (mean)
 
 def compute_feature_vector(state):
-    feature_vector = np.zeros(4)
+    feature_vector = np.zeros(5)
     snake_bodies = get_snake_bodies(state)
     # distance to food
     feature_vector[0] = distance_to_food_when_hungry(state, snake_bodies)
