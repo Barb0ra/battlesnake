@@ -122,9 +122,10 @@ def transform_state(game_state):
                 (snake['head']['x'], snake['head']['y']))
             transformed_state['snake_bodies'].append([])
             # do not append head to body
-            for body in snake['body'][1:]:
-                transformed_state['snake_bodies'][-1].append(
-                    (body['x'], body['y']))
+            if len(snake['body']) > 1:
+                for body in snake['body'][1:]:
+                    transformed_state['snake_bodies'][-1].append(
+                        (body['x'], body['y']))
             transformed_state['snake_lengths'].append(snake['length'])
             transformed_state['snake_healths'].append(snake['health'])
     return transformed_state
