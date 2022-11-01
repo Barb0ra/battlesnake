@@ -101,7 +101,7 @@ class StateNode:
 
 
 def monte_carlo_tree_search(game_state, timeout_start):
-    timeout = 0.4
+    timeout = 0.3
     # iterative deepening
     root_state = StateNode(game_state)
     root_state.generate_actions()

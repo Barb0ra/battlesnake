@@ -2,7 +2,7 @@ import numpy as np
 
 from state_generator import next_state_for_action
 
-feature_weights = np.array([-1, 2, 2, 0])
+feature_weights = np.array([-1, 2, 2, 0, -0.5])
 
 def get_value(state):
     feature_vector = compute_feature_vector(state)
@@ -13,7 +13,7 @@ def compute_feature_vector(state):
     feature_vector = np.zeros(4)
     snake_bodies = get_snake_bodies(state)
     # distance to food
-    feature_vector[0] = distance_to_food(state, snake_bodies)
+    feature_vector[0] = distance_to_food_when_hungry(state, snake_bodies)
     # area control
     feature_vector[1] = bfs_board_area_control(state, snake_bodies)
     # accessible area
@@ -21,6 +21,8 @@ def compute_feature_vector(state):
     # absolute difference between my length and the longest snake + 1
     # because we always want to be biggest
     feature_vector[3] = absolute_difference_in_length(state)
+    # my length
+    feature_vector[4] = state['snake_lengths'][0]
     return feature_vector
 
 def get_snake_bodies(state):
@@ -29,7 +31,9 @@ def get_snake_bodies(state):
         snake_bodies += snake
     return snake_bodies
 
-def distance_to_food(game_state, snake_bodies):
+def distance_to_food_when_hungry(game_state, snake_bodies):
+    if game_state['snake_healths'][0] > 20:
+        return 0
     my_head = game_state['snake_heads'][0]
     visited = set()
     queue = []
