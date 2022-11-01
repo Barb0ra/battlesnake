@@ -37,7 +37,7 @@ class SearchTree:
             self.root_state.generate_actions()
         else:
             existing_state = False
-            
+
             for state in self.root_state.get_max_action().get_states():
                 if state.game_state == game_state:
                     self.root_state = state
@@ -76,14 +76,16 @@ class StateNode:
         self.n_visited = 1
         self.parent_action = parent
         self.reward = state_reward(game_state) * 1000
-        self.terminal = is_dead(game_state,
-                                0)[0] or (len(game_state['snake_heads']) <= 2 and is_dead(game_state, 1)[0])
+        self.terminal = self.terminal(game_state)
         if self.terminal:
           self.value = 0
         else:
           self.value = get_value(game_state)
         self.game_state = cleanup_state(game_state)
         self.actions = []
+    
+    def terminal(self, game_state):
+        return len(game_state['snake_heads']) <= 1 or is_dead(game_state, 0)[0] or (len(game_state['snake_heads']) <= 2 and is_dead(game_state, 1)[0])
 
     def generate_actions(self):
         for action in ['up', 'down', 'left', 'right']:
