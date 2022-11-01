@@ -42,3 +42,5 @@ def is_dead(game_state, snake):
                  
     return False, 0
 
+
+
