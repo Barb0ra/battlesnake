@@ -86,7 +86,7 @@ def get_likely_opponent_moves(game_state, snake_index):
                 likely_moves.append(possible_move)
                 good_moves_left = True
     if not good_moves_left:
-        likely_moves = possible_moves[0]
+        likely_moves = 'up'
     return likely_moves
 
 
@@ -111,8 +111,9 @@ def transform_state(game_state):
         (game_state['you']['head']['x'], game_state['you']['head']['y']))
     transformed_state['snake_bodies'].append([])
     # do not append head to body
-    for body in game_state['you']['body'][1:]:
-        transformed_state['snake_bodies'][0].append((body['x'], body['y']))
+    if game_state['turn'] > 0:
+      for body in game_state['you']['body'][1:]:
+          transformed_state['snake_bodies'][0].append((body['x'], body['y']))
     transformed_state['snake_lengths'].append(game_state['you']['length'])
     transformed_state['snake_healths'].append(game_state['you']['health'])
     # Other snakes
@@ -122,7 +123,7 @@ def transform_state(game_state):
                 (snake['head']['x'], snake['head']['y']))
             transformed_state['snake_bodies'].append([])
             # do not append head to body
-            if len(snake['body']) > 1:
+            if game_state['turn'] > 0:
                 for body in snake['body'][1:]:
                     transformed_state['snake_bodies'][-1].append(
                         (body['x'], body['y']))

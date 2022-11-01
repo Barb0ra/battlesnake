@@ -30,6 +30,7 @@ def generate_possible_states(game_state, my_action):
 class SearchTree:
     def __init__(self):
         self.root_state = None
+        self.best_action = 'up'
 
     def set_root_state(self, game_state):
         if self.root_state == None:
@@ -38,7 +39,7 @@ class SearchTree:
         else:
             existing_state = False
 
-            for state in self.root_state.get_max_action().get_states():
+            for state in self.root_state.get_max_action().states:
                 if state.game_state == game_state:
                     self.root_state = state
                     existing_state = True
@@ -130,10 +131,10 @@ def monte_carlo_tree_search(search_tree, timeout_start):
         if iteration_counter > iterations_per_depth:
             iteration_counter = 0
             depth += 1
+        root_state.best_action = root_state.get_max_action().action
         #for action in root_state.actions:
         #    print(action.action, action.get_min_state().value,
         #          action.get_min_state().reward)
-    print(depth)
     return root_state.get_max_action().action
 
 

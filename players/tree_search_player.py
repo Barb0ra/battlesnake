@@ -24,14 +24,14 @@ class TreeSearchPlayer():
     # move is called on every turn and returns your next move
     # Valid moves are "up", "down", "left", or "right"
     timeout_start = time.time()
-    print('turn ', game_state['turn'])
+    #print('turn ', game_state['turn'])
     game_state = transform_state(game_state)
     self.search_tree.set_root_state(game_state)
 
     threading.Thread(target=monte_carlo_tree_search, args=(self.search_tree, timeout_start)).start()
     # next_move = monte_carlo_tree_search(self.search_tree, timeout_start)
     #print(action_values, next_move)
-    while time.time() - timeout_start < 0.4:
+    while time.time() - timeout_start < 0.2:
       pass
 
-    return {"move": self.search_tree.get_max_action().action}
+    return {"move": self.search_tree.root_state.best_action}
