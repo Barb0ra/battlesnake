@@ -30,7 +30,6 @@ def generate_possible_states(game_state, my_action):
 class SearchTree:
     def __init__(self):
         self.root_state = None
-        self.best_action = 'up'
 
     def set_root_state(self, game_state):
         if self.root_state == None:
@@ -84,6 +83,7 @@ class StateNode:
           self.value = get_value(game_state)
         self.game_state = cleanup_state(game_state)
         self.actions = []
+        self.max_action = 'up'
     
     def terminal(self, game_state):
         return len(game_state['snake_heads']) <= 1 or is_dead(game_state, 0)[0] or (len(game_state['snake_heads']) <= 2 and is_dead(game_state, 1)[0])
@@ -109,6 +109,7 @@ class StateNode:
             if max_action == None or min_state.value + min_state.reward > max_value:
                 max_value = min_state.value + min_state.reward
                 max_action = action
+        self.max_action = max_action.action
         return max_action
 
 

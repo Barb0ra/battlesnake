@@ -34,4 +34,4 @@ class TreeSearchPlayer():
     while time.time() - timeout_start < 0.2:
       pass
 
-    return {"move": self.search_tree.root_state.best_action}
+    return {"move": self.search_tree.root_state.max_action}
