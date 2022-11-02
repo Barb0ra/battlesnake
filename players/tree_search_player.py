@@ -27,11 +27,15 @@ class TreeSearchPlayer():
     #print('turn ', game_state['turn'])
     game_state = transform_state(game_state)
     self.search_tree.set_root_state(game_state)
+    self.search_tree.root_state.generate_actions()
 
-    threading.Thread(target=monte_carlo_tree_search, args=(self.search_tree, timeout_start)).start()
+    #threading.Thread(target=monte_carlo_tree_search, args=(self.search_tree, timeout_start)).start()
     # next_move = monte_carlo_tree_search(self.search_tree, timeout_start)
     #print(action_values, next_move)
-    while time.time() - timeout_start < 0.2:  
+    #snakes = len(game_state['snake_heads'])
+    #timeout = 0.05 * (5-snakes)
+    #print(timeout)
+    while time.time() - timeout_start < 0.5:
       pass
-    
-    return {"move": self.search_tree.root_state.max_action.action}
+
+    return {"move": self.search_tree.root_state.get_max_action().action}

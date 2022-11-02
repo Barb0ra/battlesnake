@@ -41,13 +41,13 @@ class SearchTree:
         self.root_state = None
 
     def set_root_state(self, game_state):
-        if True:
-        #if self.root_state == None or self.root_state.max_action == None:
+        if True:  
+      #if self.root_state == None:
             self.root_state = StateNode(game_state)
-            #self.root_state.get_max_action()
+            self.root_state.generate_actions()
         else:
             existing_state = False
-            for state in self.root_state.max_action.states:
+            for state in self.root_state.get_max_action().states:
                 if equal_states(state.game_state, game_state):
                     self.root_state = state
                     existing_state = True
@@ -92,7 +92,6 @@ class StateNode:
           self.value = get_value(game_state) + self.reward
         self.game_state = cleanup_state(game_state)
         self.actions = []
-        self.max_action = None
     
     def terminal(self, game_state):
         return len(game_state['snake_heads']) <= 1 or is_dead(game_state, 0)[0] or (len(game_state['snake_heads']) <= 2 and is_dead(game_state, 1)[0])
@@ -118,12 +117,11 @@ class StateNode:
             if max_action == None or min_state.value + min_state.reward > max_value:
                 max_value = min_state.value + min_state.reward
                 max_action = action
-        self.max_action = max_action
         return max_action
 
 
 def monte_carlo_tree_search(search_tree, timeout_start):
-    timeout = 0.3
+    timeout = 0.2
     # iterative deepening
     #max_depth = 6 - len(game_state['snake_heads'])
     root_state = search_tree.root_state
@@ -145,7 +143,7 @@ def monte_carlo_tree_search(search_tree, timeout_start):
         #for action in root_state.actions:
         #    print(action.action, action.get_min_state().value,
         #          action.get_min_state().reward)
-    return root_state.max_action
+    return root_state.get_max_action().action
 
 
 def get_simulation_result(leaf_state):
@@ -160,7 +158,8 @@ def traverse(state, depth):
     while depth > 0 and not state.terminal:
         depth -= 1
         accumulated_reward += state.reward
-        state = state.get_max_action().get_min_state()
+        max_action = state.get_max_action()
+        state = max_action.get_min_state()
     return state, accumulated_reward
 
 
