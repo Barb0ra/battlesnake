@@ -118,11 +118,12 @@ def monte_carlo_tree_search(search_tree, timeout_start):
     #max_depth = 6 - len(game_state['snake_heads'])
     root_state = search_tree.root_state
     depth = 1
+    max_depth = 10
     iteration_counter = 0
     iterations_per_depth = 3
     # discounting factor
     alpha = 0.8
-    while time.time() < timeout_start + timeout:
+    while time.time() < timeout_start + timeout and depth <= max_depth:
         leaf_state, accumulated_reward = traverse(root_state, depth)
         simulation_result = get_simulation_result(
             leaf_state) + accumulated_reward
@@ -135,6 +136,7 @@ def monte_carlo_tree_search(search_tree, timeout_start):
         #for action in root_state.actions:
         #    print(action.action, action.get_min_state().value,
         #          action.get_min_state().reward)
+    print(depth)
     return root_state.get_max_action().action
 
 

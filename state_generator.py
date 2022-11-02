@@ -86,7 +86,7 @@ def get_likely_opponent_moves(game_state, snake_index):
                 likely_moves.append(possible_move)
                 good_moves_left = True
     if not good_moves_left:
-        likely_moves = 'up'
+        likely_moves = ['up']
     return likely_moves
 
 
