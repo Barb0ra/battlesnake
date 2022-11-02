@@ -121,7 +121,7 @@ def monte_carlo_tree_search(search_tree, timeout_start):
     depth = 1
     max_depth = 10
     iteration_counter = 0
-    iterations_per_depth = 3
+    iterations_per_depth = 2
     # discounting factor
     alpha = 0.8
     while time.time() < timeout_start + timeout and depth <= max_depth:
