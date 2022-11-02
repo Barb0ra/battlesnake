@@ -27,6 +27,15 @@ def generate_possible_states(game_state, my_action):
         possible_states.append(next_state)
     return possible_states
 
+def equal_states(state1, state2):
+    if state1['snake_heads'] != state2['snake_heads']:
+        return False
+    if state1['snake_bodies'] != state2['snake_bodies']:
+        return False
+    if state1['food'] != state2['food']:
+        return False
+    return True
+
 class SearchTree:
     def __init__(self):
         self.root_state = None
@@ -37,9 +46,8 @@ class SearchTree:
             self.root_state.generate_actions()
         else:
             existing_state = False
-
-            for state in self.root_state.get_max_action().states:
-                if state.game_state == game_state:
+            for state in self.root_state.max_action.states:
+                if equal_states(state.game_state, game_state):
                     self.root_state = state
                     existing_state = True
                     break
@@ -78,12 +86,12 @@ class StateNode:
         self.reward = state_reward(game_state) * 1000
         self.terminal = self.terminal(game_state)
         if self.terminal:
-          self.value = 0
+          self.value = self.reward
         else:
-          self.value = get_value(game_state)
+          self.value = get_value(game_state) + self.reward
         self.game_state = cleanup_state(game_state)
         self.actions = []
-        self.max_action = 'up'
+        self.max_action = None
     
     def terminal(self, game_state):
         return len(game_state['snake_heads']) <= 1 or is_dead(game_state, 0)[0] or (len(game_state['snake_heads']) <= 2 and is_dead(game_state, 1)[0])
@@ -103,13 +111,13 @@ class StateNode:
         # if actions are not generated, generate them
         if len(self.actions) == 0:
             self.generate_actions()
-
         for action in self.actions:
             min_state = action.get_min_state()
+        
             if max_action == None or min_state.value + min_state.reward > max_value:
                 max_value = min_state.value + min_state.reward
                 max_action = action
-        self.max_action = max_action.action
+        self.max_action = max_action
         return max_action
 
 
@@ -123,7 +131,7 @@ def monte_carlo_tree_search(search_tree, timeout_start):
     iteration_counter = 0
     iterations_per_depth = 2
     # discounting factor
-    alpha = 0.8
+    alpha = 0.7
     while time.time() < timeout_start + timeout and depth <= max_depth:
         leaf_state, accumulated_reward = traverse(root_state, depth)
         simulation_result = get_simulation_result(
@@ -150,11 +158,10 @@ def get_simulation_result(leaf_state):
 
 def traverse(state, depth):
     accumulated_reward = 0
-    while depth > 0 and state.terminal == False:
+    while depth > 0 and not state.terminal:
         depth -= 1
-        state = state.get_max_action().get_min_state()
         accumulated_reward += state.reward
-    accumulated_reward += state.reward
+        state = state.get_max_action().get_min_state()
     return state, accumulated_reward
 
 
