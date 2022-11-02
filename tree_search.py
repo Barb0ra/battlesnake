@@ -41,9 +41,10 @@ class SearchTree:
         self.root_state = None
 
     def set_root_state(self, game_state):
-        if self.root_state == None:
+        if True:
+        #if self.root_state == None or self.root_state.max_action == None:
             self.root_state = StateNode(game_state)
-            self.root_state.generate_actions()
+            #self.root_state.get_max_action()
         else:
             existing_state = False
             for state in self.root_state.max_action.states:
@@ -122,7 +123,7 @@ class StateNode:
 
 
 def monte_carlo_tree_search(search_tree, timeout_start):
-    timeout = 0.5
+    timeout = 0.3
     # iterative deepening
     #max_depth = 6 - len(game_state['snake_heads'])
     root_state = search_tree.root_state
@@ -141,12 +142,10 @@ def monte_carlo_tree_search(search_tree, timeout_start):
         if iteration_counter > iterations_per_depth:
             iteration_counter = 0
             depth += 1
-        root_state.best_action = root_state.get_max_action().action
         #for action in root_state.actions:
         #    print(action.action, action.get_min_state().value,
         #          action.get_min_state().reward)
-    print(depth)
-    return root_state.get_max_action().action
+    return root_state.max_action
 
 
 def get_simulation_result(leaf_state):

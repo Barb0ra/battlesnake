@@ -31,7 +31,7 @@ class TreeSearchPlayer():
     threading.Thread(target=monte_carlo_tree_search, args=(self.search_tree, timeout_start)).start()
     # next_move = monte_carlo_tree_search(self.search_tree, timeout_start)
     #print(action_values, next_move)
-    while time.time() - timeout_start < 0.2:
+    while time.time() - timeout_start < 0.2:  
       pass
-
+    
     return {"move": self.search_tree.root_state.max_action.action}
