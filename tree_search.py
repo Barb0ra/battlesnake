@@ -120,7 +120,7 @@ class StateNode:
         return max_action
 
 
-def monte_carlo_tree_search(search_tree, timeout_start):
+def min_max_tree_search(search_tree, timeout_start):
     timeout = 0.2
     # iterative deepening
     #max_depth = 6 - len(game_state['snake_heads'])

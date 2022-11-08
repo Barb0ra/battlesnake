@@ -2,7 +2,7 @@ import random
 import threading
 
 from tree_search import SearchTree
-from tree_search import monte_carlo_tree_search
+from tree_search import min_max_tree_search
 from state_generator import next_state_for_action, transform_state
 import time
 
@@ -29,8 +29,8 @@ class TreeSearchPlayer():
     self.search_tree.set_root_state(game_state)
     self.search_tree.root_state.generate_actions()
 
-    #threading.Thread(target=monte_carlo_tree_search, args=(self.search_tree, timeout_start)).start()
-    # next_move = monte_carlo_tree_search(self.search_tree, timeout_start)
+    #threading.Thread(target=min_max_tree_search, args=(self.search_tree, timeout_start)).start()
+    # next_move = min_max_tree_search(self.search_tree, timeout_start)
     #print(action_values, next_move)
     #snakes = len(game_state['snake_heads'])
     #timeout = 0.05 * (5-snakes)
