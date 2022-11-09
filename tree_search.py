@@ -121,14 +121,14 @@ class StateNode:
 
 
 def min_max_tree_search(search_tree, timeout_start):
-    timeout = 0.2
+    timeout = 0.3
     # iterative deepening
     #max_depth = 6 - len(game_state['snake_heads'])
     root_state = search_tree.root_state
     depth = 1
     max_depth = 10
     iteration_counter = 0
-    iterations_per_depth = 2
+    iterations_per_depth = 1
     # discounting factor
     alpha = 0.7
     while time.time() < timeout_start + timeout and depth <= max_depth:
@@ -140,9 +140,11 @@ def min_max_tree_search(search_tree, timeout_start):
         if iteration_counter > iterations_per_depth:
             iteration_counter = 0
             depth += 1
+            print(depth)
         #for action in root_state.actions:
         #    print(action.action, action.get_min_state().value,
         #          action.get_min_state().reward)
+    
     return root_state.get_max_action().action
 
 
