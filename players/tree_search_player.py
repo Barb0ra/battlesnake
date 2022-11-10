@@ -32,5 +32,4 @@ class TreeSearchPlayer():
         action = min_max_tree_search(self.search_tree, timeout_start, timeout)
 
         print("sending reponse", time.time() - timeout_start)
-        print(action)
         return {"move": action}

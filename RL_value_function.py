@@ -2,14 +2,15 @@ import numpy as np
 
 from state_generator import next_state_for_action
 
-feature_weights = np.array([0, 2, 3, -0.5, -0.5, 0, -1])
+feature_weights = np.array([0, 2, 3, -3, 0, 0, -1])
 
 
 def get_value(state):
     feature_vector = compute_feature_vector(state)
-    value = np.dot(feature_weights, feature_vector)
-
-    return (value)
+    mean = np.dot(feature_weights, feature_vector)
+    # uncertainty of our estimate
+    variance = 50**2
+    return mean, variance
 
 
 def compute_feature_vector(state):
