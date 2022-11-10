@@ -72,7 +72,7 @@ class ActionNode:
         min = None
         min_state = None
         for state in self.states:
-            if min == None or state.value + state.reward < min:
+            if min == None or state.value < min:
                 min = state.value + state.reward
                 min_state = state
         return min_state
@@ -129,10 +129,10 @@ def min_max_tree_search(search_tree, timeout_start):
     # iterative deepening
     #max_depth = 6 - len(game_state['snake_heads'])
     root_state = search_tree.root_state
-    depth = 1
+    depth = 3
     max_depth = 10
     iteration_counter = 0
-    iterations_per_depth = 2
+    iterations_per_depth = 3
     # discounting factor
     alpha = 0.9
     while time.time() < timeout_start + timeout and depth <= max_depth:
@@ -146,9 +146,9 @@ def min_max_tree_search(search_tree, timeout_start):
             iteration_counter = 0
             depth += 1
 
-    for action in root_state.actions:
-        print(action.action, action.get_min_state().value,
-            action.get_min_state().reward)
+        for action in root_state.actions:
+            print(action.action, action.get_min_state().value,
+                action.get_min_state().reward)
 
     print(depth)
     return root_state.get_max_action().action

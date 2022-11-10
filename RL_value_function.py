@@ -2,7 +2,7 @@ import numpy as np
 
 from state_generator import next_state_for_action
 
-feature_weights = np.array([0, 2, 3, -0.5, -0.5, 0])
+feature_weights = np.array([0, 2, 3, -0.5, -0.5, 0, -1])
 
 
 def get_value(state):
@@ -13,20 +13,22 @@ def get_value(state):
 
 
 def compute_feature_vector(state):
-    feature_vector = np.zeros(6)
+    feature_vector = np.zeros(7)
     snake_bodies = get_snake_bodies(state)
     # distance to food
     feature_vector[0] = distance_to_food_when_hungry(state, snake_bodies)
     # area control
     feature_vector[1] = bfs_board_area_control(state, snake_bodies)
     # accessible area
-    feature_vector[2] = bfs_accessible_area(state, snake_bodies)
+    feature_vector[2] = bfs_accessible_area(state, snake_bodies, 0)
     # absolute difference between my length and the longest snake + 1
     # because we always want to be biggest
     feature_vector[3] = absolute_difference_in_length(state)
     # my length
     feature_vector[4] = state['snake_lengths'][0]
     feature_vector[5] = snake_hungry(state)
+    # average opponent accessible area
+    feature_vector[6] = np.mean(list(bfs_accessible_area(state, snake_bodies, i) for i in range(1, len(state['snake_heads']))))
     return feature_vector
 
 
@@ -89,14 +91,14 @@ def bfs_board_area_control(game_state, snake_bodies):
     return snake_area_control[0]
 
 
-def bfs_accessible_area(game_state, snake_bodies):
-    my_head = game_state['snake_heads'][0]
+def bfs_accessible_area(game_state, snake_bodies, snake_index):
+    head = game_state['snake_heads'][snake_index]
     visited = set()
     area = 0
     queue = []
-    if my_head not in snake_bodies and my_head not in game_state['hazards'] and my_head not in game_state['snake_heads'][1:]:
-        queue.append((my_head))
-        visited.add(my_head)
+    if head not in snake_bodies and head not in game_state['hazards'] and head not in game_state['snake_heads'][:snake_index] and head not in game_state['snake_heads'][snake_index+1:]:
+        queue.append((head))
+        visited.add(head)
         area += 1
     else:
         return area
