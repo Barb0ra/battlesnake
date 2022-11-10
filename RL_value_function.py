@@ -4,10 +4,13 @@ from state_generator import next_state_for_action
 
 feature_weights = np.array([-1, 2, 3, 0, -0.5])
 
+
 def get_value(state):
     feature_vector = compute_feature_vector(state)
-    mean = np.dot(feature_weights, feature_vector) # primitive normalisation method
-    return (mean)
+    value = np.dot(feature_weights, feature_vector)
+
+    return (value)
+
 
 def compute_feature_vector(state):
     feature_vector = np.zeros(5)
@@ -25,11 +28,13 @@ def compute_feature_vector(state):
     feature_vector[4] = state['snake_lengths'][0]
     return feature_vector
 
+
 def get_snake_bodies(state):
     snake_bodies = []
     for snake in state['snake_bodies']:
         snake_bodies += snake
     return snake_bodies
+
 
 def distance_to_food_when_hungry(game_state, snake_bodies):
     if game_state['snake_healths'][0] > 20:
@@ -51,6 +56,7 @@ def distance_to_food_when_hungry(game_state, snake_bodies):
     # return 0 is no food is reachable
     return 0
 
+
 def bfs_board_area_control(game_state, snake_bodies):
     snake_area_control = {}
     snake_queues = {}
@@ -58,7 +64,7 @@ def bfs_board_area_control(game_state, snake_bodies):
     # sort snakes by length and put me last if it's a tie
     snake_indices_by_length = sorted(
         range(len(game_state['snake_lengths'])),
-        key=lambda k: (game_state['snake_lengths'][k], 0 if k==0 else 1),
+        key=lambda k: (game_state['snake_lengths'][k], 0 if k == 0 else 1),
         reverse=True)
     for snake_index in snake_indices_by_length:
         snake_head = game_state['snake_heads'][snake_index]
@@ -67,7 +73,7 @@ def bfs_board_area_control(game_state, snake_bodies):
         if snake_head not in snake_bodies and snake_head not in game_state['hazards'] and snake_head not in game_state['snake_heads'][snake_index+1:] and snake_head not in game_state['snake_heads'][:snake_index]:
             snake_queues[snake_index].append((snake_head, 0))
             visited.add(snake_head)
-    
+
     while non_empty(snake_queues):
         for snake_index in snake_indices_by_length:
             queue = snake_queues[snake_index]
@@ -78,7 +84,7 @@ def bfs_board_area_control(game_state, snake_bodies):
                         snake_queues[snake_index].append((neighbor, 0))
                         visited.add(neighbor)
                         snake_area_control[snake_index] += 1
-    
+
     return snake_area_control[0]
 
 
@@ -102,11 +108,13 @@ def bfs_accessible_area(game_state, snake_bodies):
                 area += 1
     return area
 
+
 def non_empty(snake_queues):
     for queue in snake_queues.values():
         if queue:
             return True
     return False
+
 
 def get_neighbors(current_node, game_state, snake_bodies):
     potential_neighbors = []
@@ -123,7 +131,8 @@ def get_neighbors(current_node, game_state, snake_bodies):
             neighbors.append(neighbor)
     return neighbors
 
+
 def absolute_difference_in_length(state):
     if len(state['snake_lengths']) == 1:
-      return 0
+        return 0
     return abs(state['snake_lengths'][0] - max(state['snake_lengths'][1:]) - 1)
