@@ -176,7 +176,7 @@ def min_max_tree_search(search_tree, timeout_start, timeout):
     depth = 2
     max_depth = 10
     iteration_counter = 0
-    iterations_per_depth = 3
+    iterations_per_depth = 5
     # discounting factor
     alpha = 0.9
     while time.time() < timeout_start + timeout and depth <= max_depth:
