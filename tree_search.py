@@ -92,7 +92,7 @@ class ActionNode:
             if min == None or value < min:
                 min = value
                 min_state = state
-        return min_state
+        return min, min_state
 
     def generate_state_nodes(self, parent_state, action, timeout_start, timeout):
         states = generate_possible_states(
@@ -191,7 +191,7 @@ def min_max_tree_search(search_tree, timeout_start, timeout):
             depth += 1
 
     for action in root_state.actions:
-        state = action.get_state_with_smallest_mean()
+        value, state = action.get_state_with_smallest_mean()
         print(action.action, state.value_mean, state.value_variance,
               state.reward)
 
