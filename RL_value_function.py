@@ -2,7 +2,7 @@ import numpy as np
 
 from state_generator import next_state_for_action
 
-feature_weights = np.array([-1, 2, 3, 0, -0.5])
+feature_weights = np.array([0, 2, 3, -0.5, -0.5, 0])
 
 
 def get_value(state):
@@ -13,7 +13,7 @@ def get_value(state):
 
 
 def compute_feature_vector(state):
-    feature_vector = np.zeros(5)
+    feature_vector = np.zeros(6)
     snake_bodies = get_snake_bodies(state)
     # distance to food
     feature_vector[0] = distance_to_food_when_hungry(state, snake_bodies)
@@ -26,6 +26,8 @@ def compute_feature_vector(state):
     feature_vector[3] = absolute_difference_in_length(state)
     # my length
     feature_vector[4] = state['snake_lengths'][0]
+    feature_vector[5] = snake_hungry(state)
+    print(feature_vector)
     return feature_vector
 
 
@@ -136,3 +138,8 @@ def absolute_difference_in_length(state):
     if len(state['snake_lengths']) == 1:
         return 0
     return abs(state['snake_lengths'][0] - max(state['snake_lengths'][1:]) - 1)
+
+def snake_hungry(state):
+    if state['snake_healths'][0] < 20:
+        return 20 - state['snake_healths'][0]
+    return 0

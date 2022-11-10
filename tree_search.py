@@ -52,12 +52,11 @@ class SearchTree:
             existing_state = False
             for state in self.root_state.get_max_action().states:
                 if equal_states(state.game_state, game_state):
-                    print("found match")
                     self.root_state = state
+                    self.root_state.game_state = game_state
                     existing_state = True
                     break
             if not existing_state:
-                print("no state")
                 self.root_state = StateNode(game_state)
                 self.root_state.generate_actions()
 

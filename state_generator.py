@@ -30,6 +30,7 @@ def next_state_for_action(game_state, snake_index, action):
     # remove the tail if the snake did not eat food
     if not ate_food:
         game_state['snake_bodies'][snake_index].pop(-1)
+        game_state['snake_healths'][snake_index] -= 1
 
 
     return game_state
