@@ -27,7 +27,6 @@ def compute_feature_vector(state):
     # my length
     feature_vector[4] = state['snake_lengths'][0]
     feature_vector[5] = snake_hungry(state)
-    print(feature_vector)
     return feature_vector
 
 

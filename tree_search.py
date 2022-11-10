@@ -134,21 +134,23 @@ def min_max_tree_search(search_tree, timeout_start):
     iteration_counter = 0
     iterations_per_depth = 2
     # discounting factor
-    alpha = 1
+    alpha = 0.9
     while time.time() < timeout_start + timeout and depth <= max_depth:
-        leaf_state, accumulated_reward = traverse(root_state, depth)
-        simulation_result = get_simulation_result(
-            leaf_state) + accumulated_reward
-        backpropagate(leaf_state, simulation_result, alpha)
+        #leaf_state, accumulated_reward = traverse(root_state, depth)
+        #simulation_result = get_simulation_result(
+        #    leaf_state) + accumulated_reward
+        #backpropagate(leaf_state, simulation_result, alpha)
+        update_state_nodes(root_state, depth, alpha, 0)
         iteration_counter += 1
-        if iteration_counter > iterations_per_depth:
+        if iteration_counter >= iterations_per_depth:
             iteration_counter = 0
             depth += 1
 
     for action in root_state.actions:
         print(action.action, action.get_min_state().value,
-              action.get_min_state().reward)
+            action.get_min_state().reward)
 
+    print(depth)
     return root_state.get_max_action().action
 
 
@@ -179,3 +181,14 @@ def backpropagate(state, result, alpha):
     if state.parent_action == None:
         return
     backpropagate(state.parent_action.parent_state, result, alpha)
+
+def update_state_nodes(state, depth, alpha, accumulated_reward):
+    if depth == 0 or state.terminal:
+        return state.value + accumulated_reward
+    max_action = state.get_max_action()
+    min_state = max_action.get_min_state()
+    min_state_value = update_state_nodes(min_state, depth - 1, alpha, accumulated_reward + state.reward)
+    state.update_value(min_state_value)
+    return min_state_value * alpha
+
+
