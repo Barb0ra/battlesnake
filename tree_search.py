@@ -3,11 +3,11 @@ import copy
 import numpy as np
 from RL_value_function import get_value
 from RL_state_reward import is_dead, state_reward
-from state_generator import get_likely_opponent_moves, cleanup_state, next_state_for_action
+from state_generator import get_likely_moves, cleanup_state, next_state_for_action
 import time
 
 
-def generate_possible_states(game_state, my_action):
+def generate_possible_states(game_state, my_action, timeout_start, timeout):
     # returns an array of possible states
     possible_states = []
     opponents_left = len(game_state['snake_heads']) - 1
@@ -16,7 +16,7 @@ def generate_possible_states(game_state, my_action):
     likely_opponent_moves = []
     for opponent in range(opponents_left):
         likely_opponent_moves.append(
-            get_likely_opponent_moves(game_state, opponent + 1))
+            get_likely_moves(game_state, opponent + 1))
     move_combinations = list(itertools.product(*likely_opponent_moves))
     # how the board changes when I move
     my_next_state = next_state_for_action(game_state, 0, my_action)
@@ -27,6 +27,10 @@ def generate_possible_states(game_state, my_action):
             next_state = next_state_for_action(
                 next_state, snake_index + 1, move)
         possible_states.append(next_state)
+        # this operation is time consuming if there are many possible move combinations
+        # we need to check if we are running out of time
+        if time.time() > timeout_start + timeout:
+            break
     return possible_states
 
 
@@ -44,13 +48,13 @@ class SearchTree:
     def __init__(self):
         self.root_state = None
 
-    def set_root_state(self, game_state):
+    def set_root_state(self, game_state, timeout_start, timeout):
         if self.root_state == None:
             self.root_state = StateNode(game_state)
-            self.root_state.generate_actions()
+            self.root_state.generate_actions(timeout_start, timeout)
         else:
             existing_state = False
-            for state in self.root_state.get_max_action().states:
+            for state in self.root_state.get_max_action(timeout_start, timeout).states:
                 if equal_states(state.game_state, game_state):
                     self.root_state = state
                     self.root_state.game_state = game_state
@@ -58,15 +62,16 @@ class SearchTree:
                     break
             if not existing_state:
                 self.root_state = StateNode(game_state)
-                self.root_state.generate_actions()
+                self.root_state.generate_actions(timeout_start, timeout)
 
 
 class ActionNode:
 
-    def __init__(self, parent, action):
+    def __init__(self, parent, action, timeout_start, timeout):
         self.parent_state = parent
         self.action = action
-        self.states = self.generate_state_nodes(parent.game_state, action)
+        self.states = self.generate_state_nodes(
+            parent.game_state, action, timeout_start, timeout)
 
     def get_min_state(self):
         min = None
@@ -77,8 +82,9 @@ class ActionNode:
                 min_state = state
         return min_state
 
-    def generate_state_nodes(self, parent_state, action):
-        states = generate_possible_states(parent_state, action)
+    def generate_state_nodes(self, parent_state, action, timeout_start, timeout):
+        states = generate_possible_states(
+            parent_state, action, timeout_start, timeout)
         return [StateNode(state, self) for state in states]
 
 
@@ -99,22 +105,23 @@ class StateNode:
     def terminal(self, game_state):
         return len(game_state['snake_heads']) <= 1 or is_dead(game_state, 0)[0] or (len(game_state['snake_heads']) <= 2 and is_dead(game_state, 1)[0])
 
-    def generate_actions(self):
+    def generate_actions(self, timeout_start, timeout):
         if len(self.actions) == 0:
-            for action in ['up', 'down', 'left', 'right']:
-                self.actions.append(ActionNode(self, action))
+            for action in get_likely_moves(self.game_state, 0):
+                self.actions.append(ActionNode(
+                    self, action, timeout_start, timeout))
 
     def update_value(self, value):
         self.n_visited += 1
         self.value = (self.value * (self.n_visited - 1) +
                       value) / self.n_visited
 
-    def get_max_action(self):
+    def get_max_action(self, timeout_start, timeout):
         max_value = None
         max_action = None
         # if actions are not generated, generate them
         if len(self.actions) == 0:
-            self.generate_actions()
+            self.generate_actions(timeout_start, timeout)
         for action in self.actions:
             min_state = action.get_min_state()
 
@@ -124,12 +131,11 @@ class StateNode:
         return max_action
 
 
-def min_max_tree_search(search_tree, timeout_start):
-    timeout = 0.2
+def min_max_tree_search(search_tree, timeout_start, timeout):
     # iterative deepening
     #max_depth = 6 - len(game_state['snake_heads'])
     root_state = search_tree.root_state
-    depth = 3
+    depth = 2
     max_depth = 10
     iteration_counter = 0
     iterations_per_depth = 3
@@ -137,58 +143,33 @@ def min_max_tree_search(search_tree, timeout_start):
     alpha = 0.9
     while time.time() < timeout_start + timeout and depth <= max_depth:
         #leaf_state, accumulated_reward = traverse(root_state, depth)
-        #simulation_result = get_simulation_result(
+        # simulation_result = get_simulation_result(
         #    leaf_state) + accumulated_reward
         #backpropagate(leaf_state, simulation_result, alpha)
-        update_state_nodes(root_state, depth, alpha, 0)
+        update_state_nodes(root_state, depth, alpha, 0, timeout_start, timeout)
         iteration_counter += 1
         if iteration_counter >= iterations_per_depth:
             iteration_counter = 0
             depth += 1
 
-        for action in root_state.actions:
-            print(action.action, action.get_min_state().value,
-                action.get_min_state().reward)
+    for action in root_state.actions:
+        print(action.action, action.get_min_state().value,
+              action.get_min_state().reward)
 
     print(depth)
-    return root_state.get_max_action().action
+    return root_state.get_max_action(timeout_start, timeout).action
 
 
 def get_simulation_result(leaf_state):
     return leaf_state.value
 
 
-# function for state traversal
-
-
-def traverse(state, depth):
-    accumulated_reward = 0
-    while depth > 0 and not state.terminal:
-        depth -= 1
-        accumulated_reward += state.reward
-        max_action = state.get_max_action()
-        state = max_action.get_min_state()
-
-    return state, accumulated_reward
-
-
-# function for backpropagation
-
-
-def backpropagate(state, result, alpha):
-    state.update_value(result)
-    result = result * alpha
-    if state.parent_action == None:
-        return
-    backpropagate(state.parent_action.parent_state, result, alpha)
-
-def update_state_nodes(state, depth, alpha, accumulated_reward):
+def update_state_nodes(state, depth, alpha, accumulated_reward, timeout_start, timeout):
     if depth == 0 or state.terminal:
         return state.value + accumulated_reward
-    max_action = state.get_max_action()
+    max_action = state.get_max_action(timeout_start, timeout)
     min_state = max_action.get_min_state()
-    min_state_value = update_state_nodes(min_state, depth - 1, alpha, accumulated_reward + state.reward)
+    min_state_value = update_state_nodes(
+        min_state, depth - 1, alpha, accumulated_reward + state.reward, timeout_start, timeout)
     state.update_value(min_state_value)
     return min_state_value * alpha
-
-

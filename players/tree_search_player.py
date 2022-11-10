@@ -24,12 +24,13 @@ class TreeSearchPlayer():
         # move is called on every turn and returns your next move
         # Valid moves are "up", "down", "left", or "right"
         timeout_start = time.time()
+        timeout = 0.2
         print('turn ', game_state['turn'])
         game_state = transform_state(game_state)
-        self.search_tree.set_root_state(game_state)
+        #print(f"game state: {game_state}")
+        self.search_tree.set_root_state(game_state, timeout_start, timeout)
+        action = min_max_tree_search(self.search_tree, timeout_start, timeout)
 
-        action = min_max_tree_search(self.search_tree, timeout_start)
-
-        print(time.time() - timeout_start)
+        print("sending reponse", time.time() - timeout_start)
         print(action)
         return {"move": action}
