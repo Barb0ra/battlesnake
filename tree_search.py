@@ -94,6 +94,16 @@ class ActionNode:
                 min_state = state
         return min, min_state
 
+    def get_state_with_lowest_lcb(self):
+        min = None
+        min_state = None
+        for state in self.states:
+            value = state.mean - 2*(state.variance)**0.5
+            if min == None or value < min:
+                min = value
+                min_state = state
+        return min, min_state
+
     def generate_state_nodes(self, parent_state, action, timeout_start, timeout):
         states = generate_possible_states(
             parent_state, action, timeout_start, timeout)
@@ -158,10 +168,11 @@ class StateNode:
         if len(self.actions) == 0:
             self.generate_actions(timeout_start, timeout)
         for action in self.actions:
-            state_mean, min_state = action.get_state_with_smallest_mean()
+            state_val, min_state = action.get_state_with_smallest_mean()
+            #state_val, min_state = action.get_state_with_lowest_lcb()
 
-            if max_action == None or state_mean > max_value:
-                max_value = state_mean
+            if max_action == None or state_val > max_value:
+                max_value = state_val
                 max_action = action
         return max_action
 
@@ -170,12 +181,12 @@ def min_max_tree_search(search_tree, timeout_start, timeout):
     # iterative deepening
     #max_depth = 6 - len(game_state['snake_heads'])
     root_state = search_tree.root_state
-    depth = 2
+    depth = 3
     max_depth = 10
     iteration_counter = 0
-    iterations_per_depth = 3
+    iterations_per_depth = 5
     # discounting factor
-    alpha = 0.9
+    alpha = 0.7
     while time.time() < timeout_start + timeout and depth <= max_depth:
 
         max_action, min_state = root_state.sample_max_action(
@@ -186,11 +197,11 @@ def min_max_tree_search(search_tree, timeout_start, timeout):
         if iteration_counter >= iterations_per_depth:
             iteration_counter = 0
             depth += 1
-
-    for action in root_state.actions:
-        value, state = action.get_state_with_smallest_mean()
-        print(action.action, state.mean, state.variance,
-              state.reward)
+        print('actions')
+        for action in root_state.actions:
+            value, state = action.get_state_with_smallest_mean()
+            print(action.action, state.mean, state.variance,
+                state.reward)
     print(depth)
     return root_state.get_max_action(timeout_start, timeout).action
 

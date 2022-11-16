@@ -24,7 +24,7 @@ class TreeSearchPlayer():
         # move is called on every turn and returns your next move
         # Valid moves are "up", "down", "left", or "right"
         timeout_start = time.time()
-        timeout = 0.3
+        timeout = 0.25
         print('turn ', game_state['turn'])
         game_state = transform_state(game_state)
         #print(f"game state: {game_state}")

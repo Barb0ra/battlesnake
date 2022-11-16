@@ -9,7 +9,7 @@ def get_value(state):
     feature_vector = compute_feature_vector(state)
     mean = np.dot(feature_weights, feature_vector)
     # uncertainty of our estimate
-    variance = 0.5**2
+    variance = 0.6**2
     return mean/1000, variance
 
 
