@@ -105,7 +105,7 @@ class StateNode:
     def __init__(self, game_state, parent=None):
         self.n_visited = 1
         self.parent_action = parent
-        self.reward = state_reward(game_state) * 1000
+        self.reward = state_reward(game_state)
         self.terminal = self.terminal(game_state)
         if self.terminal:
             self.mean = self.reward
@@ -136,6 +136,7 @@ class StateNode:
     def sample_max_action(self, timeout_start, timeout):
         max_value = None
         max_action = None
+        min_state_for_max_action = None
         # if actions are not generated, generate them
         if len(self.actions) == 0:
             self.generate_actions(timeout_start, timeout)
@@ -145,7 +146,8 @@ class StateNode:
             if max_action == None or state_sample_value > max_value:
                 max_value = state_sample_value
                 max_action = action
-        return max_action
+                min_state_for_max_action = min_state
+        return max_action, min_state_for_max_action
 
     def get_max_action(self, timeout_start, timeout):
         # get action with the highest min state mean value (deterministic)
@@ -156,10 +158,10 @@ class StateNode:
         if len(self.actions) == 0:
             self.generate_actions(timeout_start, timeout)
         for action in self.actions:
-            state_value_mean, min_state = action.get_state_with_smallest_mean()
+            state_mean, min_state = action.get_state_with_smallest_mean()
 
-            if max_action == None or state_value_mean > max_value:
-                max_value = state_value_mean
+            if max_action == None or state_mean > max_value:
+                max_value = state_mean
                 max_action = action
         return max_action
 
@@ -171,11 +173,15 @@ def min_max_tree_search(search_tree, timeout_start, timeout):
     depth = 2
     max_depth = 10
     iteration_counter = 0
-    iterations_per_depth = 5
+    iterations_per_depth = 3
     # discounting factor
     alpha = 0.9
     while time.time() < timeout_start + timeout and depth <= max_depth:
-        update_state_nodes(root_state, depth, alpha, 0, timeout_start, timeout)
+
+        max_action, min_state = root_state.sample_max_action(
+            timeout_start, timeout)
+        update_state_nodes(min_state, depth-1, alpha,
+                           0, timeout_start, timeout)
         iteration_counter += 1
         if iteration_counter >= iterations_per_depth:
             iteration_counter = 0
@@ -185,16 +191,14 @@ def min_max_tree_search(search_tree, timeout_start, timeout):
         value, state = action.get_state_with_smallest_mean()
         print(action.action, state.mean, state.variance,
               state.reward)
-
     print(depth)
     return root_state.get_max_action(timeout_start, timeout).action
 
 
 def update_state_nodes(state, depth, alpha, accumulated_reward, timeout_start, timeout):
     if depth == 0 or state.terminal:
-        return state.value_mean + accumulated_reward
-    max_action = state.sample_max_action(timeout_start, timeout)
-    min_sample, min_state = max_action.sample_min_state()
+        return state.mean + accumulated_reward
+    max_action, min_state = state.sample_max_action(timeout_start, timeout)
     min_state_value = update_state_nodes(
         min_state, depth - 1, alpha, accumulated_reward + state.reward, timeout_start, timeout)
     state.update_value(min_state_value)
