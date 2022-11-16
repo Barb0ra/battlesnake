@@ -31,5 +31,4 @@ class TreeSearchPlayer():
         self.search_tree.set_root_state(game_state, timeout_start, timeout)
         action = min_max_tree_search(self.search_tree, timeout_start, timeout)
 
-        print("sending reponse", time.time() - timeout_start)
         return {"move": action}

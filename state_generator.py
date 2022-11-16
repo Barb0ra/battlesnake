@@ -20,7 +20,6 @@ def next_state_for_action(game_state, snake_index, action):
     if next_position in food:
         ate_food = True
         game_state['snake_lengths'][snake_index] += 1
-        # TODO: check rules for health
         game_state['snake_healths'][snake_index] = 100
 
     # add head to body

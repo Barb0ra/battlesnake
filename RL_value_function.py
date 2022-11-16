@@ -2,7 +2,7 @@ import numpy as np
 
 from state_generator import next_state_for_action
 
-feature_weights = np.array([0, 2, 3, -3, 0, 0, -1])
+feature_weights = np.array([0, 2, 2, -3, 0, 0, -1])
 
 
 def get_value(state):

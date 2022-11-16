@@ -73,7 +73,7 @@ class ActionNode:
         self.states = self.generate_state_nodes(
             parent.game_state, action, timeout_start, timeout)
 
-    def get_min_state_sample(self):
+    def sample_min_state(self):
         min = None
         min_state = None
         for state in self.states:
@@ -88,7 +88,7 @@ class ActionNode:
         min = None
         min_state = None
         for state in self.states:
-            value = state.value_mean
+            value = state.mean
             if min == None or value < min:
                 min = value
                 min_state = state
@@ -108,12 +108,12 @@ class StateNode:
         self.reward = state_reward(game_state) * 1000
         self.terminal = self.terminal(game_state)
         if self.terminal:
-            self.value_mean = self.reward
-            self.value_variance = 0
+            self.mean = self.reward
+            self.variance = 0
         else:
-            value_mean, value_variance = get_value(game_state)
-            self.value_mean = value_mean + self.reward
-            self.value_variance = value_variance
+            mean, variance = get_value(game_state)
+            self.mean = mean + self.reward
+            self.variance = variance
         self.game_state = cleanup_state(game_state)
         self.actions = []
 
@@ -127,25 +127,20 @@ class StateNode:
                     self, action, timeout_start, timeout))
 
     def update_value(self, value):
-        self.n_visited += 1
-        true_precision = 1/25
-        tau = 1 / self.value_variance
-        tau += 1 * true_precision
-        self.value_variance = 1/tau
-        self.value_mean = (tau * self.value_variance +
-                               true_precision * value) / (tau + true_precision)
+        self.mean = (self.variance * value + self.mean) / (self.variance + 1)
+        self.variance = 1 / (1 / self.variance + 1)
 
     def get_sample_value(self):
-        return np.random.normal(self.value_mean, np.sqrt(self.value_variance))
+        return np.random.normal(self.mean, np.sqrt(self.variance))
 
-    def get_max_action_sample(self, timeout_start, timeout):
+    def sample_max_action(self, timeout_start, timeout):
         max_value = None
         max_action = None
         # if actions are not generated, generate them
         if len(self.actions) == 0:
             self.generate_actions(timeout_start, timeout)
         for action in self.actions:
-            state_sample_value, min_state = action.get_min_state_sample()
+            state_sample_value, min_state = action.sample_min_state()
 
             if max_action == None or state_sample_value > max_value:
                 max_value = state_sample_value
@@ -180,10 +175,6 @@ def min_max_tree_search(search_tree, timeout_start, timeout):
     # discounting factor
     alpha = 0.9
     while time.time() < timeout_start + timeout and depth <= max_depth:
-        #leaf_state, accumulated_reward = traverse(root_state, depth)
-        # simulation_result = get_simulation_result(
-        #    leaf_state) + accumulated_reward
-        #backpropagate(leaf_state, simulation_result, alpha)
         update_state_nodes(root_state, depth, alpha, 0, timeout_start, timeout)
         iteration_counter += 1
         if iteration_counter >= iterations_per_depth:
@@ -192,22 +183,18 @@ def min_max_tree_search(search_tree, timeout_start, timeout):
 
     for action in root_state.actions:
         value, state = action.get_state_with_smallest_mean()
-        print(action.action, state.value_mean, state.value_variance,
+        print(action.action, state.mean, state.variance,
               state.reward)
 
     print(depth)
     return root_state.get_max_action(timeout_start, timeout).action
 
 
-def get_simulation_result(leaf_state):
-    return leaf_state.value
-
-
 def update_state_nodes(state, depth, alpha, accumulated_reward, timeout_start, timeout):
     if depth == 0 or state.terminal:
         return state.value_mean + accumulated_reward
-    max_action = state.get_max_action_sample(timeout_start, timeout)
-    min_sample, min_state = max_action.get_min_state_sample()
+    max_action = state.sample_max_action(timeout_start, timeout)
+    min_sample, min_state = max_action.sample_min_state()
     min_state_value = update_state_nodes(
         min_state, depth - 1, alpha, accumulated_reward + state.reward, timeout_start, timeout)
     state.update_value(min_state_value)
