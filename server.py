@@ -5,8 +5,37 @@ import typing
 from flask import Flask
 from flask import request
 
+from players.heuristic_player import HeuristicPlayer
+from players.random_player import RandomPlayer
+from players.self_preserving_player import SelfPreservingPlayer
+from players.tree_search_player import TreeSearchPlayer
 
-def run_server(handlers: typing.Dict):
+# start is called when your Battlesnake begins a game
+
+
+def start(game_state: typing.Dict):
+    print("GAME START")
+
+
+# end is called when your Battlesnake finishes a game
+def end(game_state: typing.Dict):
+    print("GAME OVER\n")
+
+
+def run_server(port, player_name):
+    players = {
+        'tree_search': TreeSearchPlayer,
+        'random': RandomPlayer,
+        'self_preserving': SelfPreservingPlayer,
+        'heuristic': HeuristicPlayer
+    }
+    player = players[player_name]()
+    handlers = {
+        "info": player.info,
+        "start": start,
+        "move": player.move,
+        "end": end
+    }
     app = Flask("Battlesnake")
 
     @app.get("/")
@@ -38,7 +67,7 @@ def run_server(handlers: typing.Dict):
         return response
 
     host = "0.0.0.0"
-    port = int(os.environ.get("PORT", "8000"))
+    port = int(os.environ.get("PORT", port))
 
     logging.getLogger("werkzeug").setLevel(logging.ERROR)
 
