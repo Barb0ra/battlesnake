@@ -9,6 +9,7 @@ from players.heuristic_player import HeuristicPlayer
 from players.random_player import RandomPlayer
 from players.self_preserving_player import SelfPreservingPlayer
 from players.tree_search_player import TreeSearchPlayer
+from players.one_step_lookahead_player import OneStepLookaheadPlayer
 
 # start is called when your Battlesnake begins a game
 
@@ -27,7 +28,8 @@ def run_server(port, player_name):
         'tree_search': TreeSearchPlayer,
         'random': RandomPlayer,
         'self_preserving': SelfPreservingPlayer,
-        'heuristic': HeuristicPlayer
+        'heuristic': HeuristicPlayer,
+        'one_step_lookahead': OneStepLookaheadPlayer
     }
     player = players[player_name]()
     handlers = {

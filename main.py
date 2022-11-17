@@ -7,4 +7,4 @@ import typing
 if __name__ == "__main__":
     from server import run_server
 
-    run_server(8000, 'tree_search')
+    run_server(8000, 'one_step_lookahead')
