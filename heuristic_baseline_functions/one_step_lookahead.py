@@ -1,7 +1,7 @@
 import itertools
 import copy
-from state_reward_heuristic import state_reward
-from state_value import state_value_deterministic
+from heuristic_baseline_functions.state_reward_heuristic import state_reward
+from heuristic_baseline_functions.state_value import state_value_deterministic
 from state_generator import next_state_for_action
 
 
