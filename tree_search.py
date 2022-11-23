@@ -42,7 +42,7 @@ def equal_states(state1, state2):
     if state1['food'] != state2['food']:
         return False
     return True
-
+      
 
 class SearchTree:
     def __init__(self):
@@ -113,17 +113,23 @@ class ActionNode:
 class StateNode:
 
     def __init__(self, game_state, parent=None):
+
         self.n_visited = 1
         self.parent_action = parent
         self.reward = state_reward(game_state)
+        # gamma's shape parameter
+        self.alpha = 1
         self.terminal = self.terminal(game_state)
+
         if self.terminal:
             self.mean = self.reward
             self.variance = 0
+            self.beta = 0
         else:
             mean, variance = get_value(game_state)
             self.mean = mean + self.reward
             self.variance = variance
+            self.beta = variance
         self.game_state = cleanup_state(game_state)
         self.actions = []
 
@@ -136,9 +142,12 @@ class StateNode:
                 self.actions.append(ActionNode(
                     self, action, timeout_start, timeout))
 
-    def update_value(self, value):
-        self.mean = (self.variance * value + self.mean) / (self.variance + 1)
-        self.variance = 1 / (1 / self.variance + 1)
+    def update_value(self, observation):
+        self.mean += (observation + self.mean*self.n_visited) / (self.n_visited+1)
+        self.beta += 0.25 * self.n_visited/(self.n_visited+1) * (observation - self.mean)**2
+        self.n_visited += 1
+        self.alpha += 0.5
+        self.variance = self.beta / (self.alpha + 1)
 
     def get_sample_value(self):
         return np.random.normal(self.mean, np.sqrt(self.variance))
@@ -181,13 +190,19 @@ def min_max_tree_search(search_tree, timeout_start, timeout):
     # iterative deepening
     #max_depth = 6 - len(game_state['snake_heads'])
     root_state = search_tree.root_state
-    depth = 3
+    depth = 4
     max_depth = 10
     iteration_counter = 0
     iterations_per_depth = 5
     # discounting factor
     alpha = 0.7
     while time.time() < timeout_start + timeout and depth <= max_depth:
+        
+        print('actions')
+        for action in root_state.actions:
+            print(action.action)
+            for state in action.states:
+                print(state.mean, state.variance)
 
         max_action, min_state = root_state.sample_max_action(
             timeout_start, timeout)
@@ -197,11 +212,7 @@ def min_max_tree_search(search_tree, timeout_start, timeout):
         if iteration_counter >= iterations_per_depth:
             iteration_counter = 0
             depth += 1
-        print('actions')
-        for action in root_state.actions:
-            value, state = action.get_state_with_smallest_mean()
-            print(action.action, state.mean, state.variance,
-                state.reward)
+
     print(depth)
     return root_state.get_max_action(timeout_start, timeout).action
 

@@ -14,8 +14,10 @@ from players.one_step_lookahead_player import OneStepLookaheadPlayer
 # start is called when your Battlesnake begins a game
 
 
-def start(game_state: typing.Dict):
+def start(game_state: typing.Dict, player, player_name):
     print("GAME START")
+    if player_name == 'tree_search':
+        player.search_tree.root_state = None
 
 
 # end is called when your Battlesnake finishes a game
@@ -47,7 +49,7 @@ def run_server(port, player_name):
     @app.post("/start")
     def on_start():
         game_state = request.get_json()
-        handlers["start"](game_state)
+        handlers["start"](game_state, player, player_name)
         return "ok"
 
     @app.post("/move")
