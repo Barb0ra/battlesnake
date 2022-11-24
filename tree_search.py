@@ -143,8 +143,8 @@ class StateNode:
                     self, action, timeout_start, timeout))
 
     def update_value(self, observation):
-        self.mean += (observation + self.mean*self.n_visited) / (self.n_visited+1)
-        self.beta += 0.25 * self.n_visited/(self.n_visited+1) * (observation - self.mean)**2
+        self.mean = (observation + self.mean*self.n_visited) / (self.n_visited+1)
+        self.beta += 0.5 * self.n_visited/(self.n_visited+1) * (observation - self.mean)**2
         self.n_visited += 1
         self.alpha += 0.5
         self.variance = self.beta / (self.alpha + 1)
@@ -190,19 +190,19 @@ def min_max_tree_search(search_tree, timeout_start, timeout):
     # iterative deepening
     #max_depth = 6 - len(game_state['snake_heads'])
     root_state = search_tree.root_state
-    depth = 4
+    depth = 3
     max_depth = 10
     iteration_counter = 0
     iterations_per_depth = 5
     # discounting factor
-    alpha = 0.7
+    alpha = 0.8
     while time.time() < timeout_start + timeout and depth <= max_depth:
         
-        print('actions')
-        for action in root_state.actions:
-            print(action.action)
-            for state in action.states:
-                print(state.mean, state.variance)
+        #print('actions')
+        #for action in root_state.actions:
+        #    print(action.action)
+        #    for state in action.states:
+        #        print(state.mean, state.variance)
 
         max_action, min_state = root_state.sample_max_action(
             timeout_start, timeout)
