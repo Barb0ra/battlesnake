@@ -3,7 +3,7 @@ import random
 
 class RandomPlayer():
 
-  def __init__(self):
+  def __init__(self, params):
     self.rewards = {}
 
   def info(self):

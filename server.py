@@ -25,7 +25,7 @@ def end(game_state: typing.Dict):
     print("GAME OVER\n")
 
 
-def run_server(port, player_name):
+def run_server(port, player_name, params):
     players = {
         'tree_search': TreeSearchPlayer,
         'random': RandomPlayer,
@@ -33,7 +33,7 @@ def run_server(port, player_name):
         'heuristic': HeuristicPlayer,
         'one_step_lookahead': OneStepLookaheadPlayer
     }
-    player = players[player_name]()
+    player = players[player_name](params)
     handlers = {
         "info": player.info,
         "start": start,

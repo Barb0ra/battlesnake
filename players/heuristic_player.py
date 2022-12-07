@@ -5,7 +5,7 @@ from heuristic_baseline_functions.state_reward_heuristic import state_reward
 
 class HeuristicPlayer():
 
-  def __init__(self):
+  def __init__(self, params):
     self.rewards = {
       'death': -100,
       'opponent_death': 50,

@@ -48,13 +48,13 @@ class SearchTree:
     def __init__(self):
         self.root_state = None
 
-    def set_root_state(self, game_state, timeout_start, timeout):
+    def set_root_state(self, game_state, timeout_start, timeout, mean_or_lcb):
         if self.root_state == None:
             self.root_state = StateNode(game_state)
             self.root_state.generate_actions(timeout_start, timeout)
         else:
             existing_state = False
-            for state in self.root_state.get_max_action(timeout_start, timeout).states:
+            for state in self.root_state.get_max_action(timeout_start, timeout, mean_or_lcb).states:
                 if equal_states(state.game_state, game_state):
                     self.root_state = state
                     self.root_state.game_state = game_state
@@ -83,7 +83,7 @@ class ActionNode:
                 min_state = state
         return sample_value, min_state
 
-    def get_state_with_smallest_mean(self):
+    def get_state_with_min_mean(self):
         # this can be used to pick the final action
         min = None
         min_state = None
@@ -94,7 +94,7 @@ class ActionNode:
                 min_state = state
         return min, min_state
 
-    def get_state_with_lowest_lcb(self):
+    def get_state_with_min_lcb(self):
         min = None
         min_state = None
         for state in self.states:
@@ -168,35 +168,32 @@ class StateNode:
                 min_state_for_max_action = min_state
         return max_action, min_state_for_max_action
 
-    def get_max_action(self, timeout_start, timeout):
+    def get_max_action(self, timeout_start, timeout, mean_or_lcb):
         # get action with the highest min state mean value (deterministic)
-        # can be used to make a final decisionon what action to take
+        # can be used to make a final decisionon about what action to take
         max_value = None
         max_action = None
         # if actions are not generated, generate them
         if len(self.actions) == 0:
             self.generate_actions(timeout_start, timeout)
         for action in self.actions:
-            state_val, min_state = action.get_state_with_smallest_mean()
-            #state_val, min_state = action.get_state_with_lowest_lcb()
+            if mean_or_lcb == 'mean':
+                state_val, min_state = action.get_state_with_min_mean()
+            elif mean_or_lcb == 'lcb':
+                state_val, min_state = action.get_state_with_min_lcb()
 
             if max_action == None or state_val > max_value:
                 max_value = state_val
                 max_action = action
         return max_action
 
-
-def min_max_tree_search(search_tree, timeout_start, timeout):
+def min_max_tree_search(search_tree, timeout_start, timeout, tree_min_depth, tree_max_depth, tree_iterations_per_depth, discounting_factor, mean_or_lcb):
     # iterative deepening
     #max_depth = 6 - len(game_state['snake_heads'])
     root_state = search_tree.root_state
-    depth = 3
-    max_depth = 10
+    depth = tree_min_depth
     iteration_counter = 0
-    iterations_per_depth = 5
-    # discounting factor
-    alpha = 0.8
-    while time.time() < timeout_start + timeout and depth <= max_depth:
+    while time.time() < timeout_start + timeout and depth <= tree_max_depth:
         
         #print('actions')
         #for action in root_state.actions:
@@ -206,19 +203,18 @@ def min_max_tree_search(search_tree, timeout_start, timeout):
 
         max_action, min_state = root_state.sample_max_action(
             timeout_start, timeout)
-        update_state_nodes(min_state, depth-1, alpha,
+        update_state_nodes(min_state, depth-1, discounting_factor,
                            0, timeout_start, timeout)
         iteration_counter += 1
-        if iteration_counter >= iterations_per_depth:
+        if iteration_counter >= tree_iterations_per_depth:
             iteration_counter = 0
             depth += 1
 
-    print(depth)
-    return root_state.get_max_action(timeout_start, timeout).action
+    return root_state.get_max_action(timeout_start, timeout, mean_or_lcb).action
 
 
 def update_state_nodes(state, depth, alpha, accumulated_reward, timeout_start, timeout):
-    if depth == 0 or state.terminal:
+    if depth == 0 or state.terminal or time.time() > timeout_start + timeout:
         return state.mean + accumulated_reward
     max_action, min_state = state.sample_max_action(timeout_start, timeout)
     min_state_value = update_state_nodes(
