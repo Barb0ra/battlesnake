@@ -1,5 +1,6 @@
 import random
 import threading
+from players.one_step_lookahead_player import OneStepLookaheadPlayer
 
 from tree_search import SearchTree
 from tree_search import min_max_tree_search
@@ -18,28 +19,32 @@ class TreeSearchPlayer():
         self.game_type = game_type
         self.game_map = game_map
         self.hazard_damage = hazard_damage
+        self.lookahead_palyer = OneStepLookaheadPlayer([], game_type, game_map, hazard_damage)
 
     def info(self):
         return {
             "apiversion": "1",
             "author": "Barbora",
             "color": "#3352FF",
-            "head": "default",  # TODO: Choose head
-            "tail": "default",  # TODO: Choose tail
+            "head": "smart-caterpillar",
+            "tail": "replit-notmark",
         }
 
     def move(self, game_state):
-        # move is called on every turn and returns your next move
-        # Valid moves are "up", "down", "left", or "right"
-        timeout_start = time.time()
-        timeout = 0.25
-        print('turn ', game_state['turn'])
-        game_state = transform_state(
-            game_state, self.game_type, self.game_map, self.hazard_damage)
-        #print(f"game state: {game_state}")
-        self.search_tree.set_root_state(game_state, timeout_start, timeout,
-                                        self.mean_or_lcb, self.game_type, self.game_map, self.hazard_damage)
-        action = min_max_tree_search(self.search_tree, timeout_start, timeout, self.tree_min_depth, self.tree_max_depth,
-                                     self.tree_iterations_per_depth, self.discounting_factor, self.mean_or_lcb, self.game_type, self.game_map, self.hazard_damage)
-        print(f"action: {action}")
-        return {"move": action}
+        if len(game_state['board']['snakes']) > 2:
+            return self.lookahead_palyer.move(game_state)
+        else:
+            # move is called on every turn and returns your next move
+            # Valid moves are "up", "down", "left", or "right"
+            timeout_start = time.time()
+            timeout = 0.35
+            print('turn ', game_state['turn'])
+            game_state = transform_state(
+                game_state, self.game_type, self.game_map, self.hazard_damage)
+            #print(f"game state: {game_state}")
+            self.search_tree.set_root_state(game_state, timeout_start, timeout,
+                                            self.mean_or_lcb, self.game_type, self.game_map, self.hazard_damage)
+            action = min_max_tree_search(self.search_tree, timeout_start, timeout, self.tree_min_depth, self.tree_max_depth,
+                                        self.tree_iterations_per_depth, self.discounting_factor, self.mean_or_lcb, self.game_type, self.game_map, self.hazard_damage)
+            print(f"action: {action}")
+            return {"move": action}

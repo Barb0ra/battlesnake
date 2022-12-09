@@ -3,7 +3,7 @@ import numpy as np
 from state_generator import next_state_for_action
 from heuristic_baseline_functions.state_reward_heuristic import bfs_nearest_food, bfs_board_domination, bfs_accessible_area, is_dead, next_to_hazard, in_hazard
 
-feature_weights = np.array([-0.5, 2, 2, 0, 0, -1, -15, -10, -20, -30])
+feature_weights = np.array([-1, 2, 2, 0, 0, -1, -15, -10, -20, -30])
 
 
 def get_value(state, game_type, game_map, hazard_damage):
@@ -49,7 +49,7 @@ def get_snake_bodies(state):
 
 
 def distance_to_food_when_hungry(game_state, snake_bodies, game_type, game_map, hazard_damage):
-    if game_state['snake_healths'][0] > 20:
+    if game_state['snake_healths'][0] > 30:
         return 0
     my_head = game_state['snake_heads'][0]
     visited = set()
