@@ -8,13 +8,16 @@ import time
 
 
 class TreeSearchPlayer():
-    def __init__(self, params):
+    def __init__(self, params, game_type, game_map, hazard_damage):
         self.search_tree = SearchTree()
         self.tree_min_depth = params[0]
         self.tree_max_depth = params[1]
         self.tree_iterations_per_depth = params[2]
         self.discounting_factor = params[3]
         self.mean_or_lcb = params[4]
+        self.game_type = game_type
+        self.game_map = game_map
+        self.hazard_damage = hazard_damage
 
     def info(self):
         return {
@@ -30,10 +33,13 @@ class TreeSearchPlayer():
         # Valid moves are "up", "down", "left", or "right"
         timeout_start = time.time()
         timeout = 0.25
-        #print('turn ', game_state['turn'])
-        game_state = transform_state(game_state)
+        print('turn ', game_state['turn'])
+        game_state = transform_state(
+            game_state, self.game_type, self.game_map, self.hazard_damage)
         #print(f"game state: {game_state}")
-        self.search_tree.set_root_state(game_state, timeout_start, timeout, self.mean_or_lcb)
-        action = min_max_tree_search(self.search_tree, timeout_start, timeout, self.tree_min_depth, self.tree_max_depth, self.tree_iterations_per_depth, self.discounting_factor, self.mean_or_lcb)
-
+        self.search_tree.set_root_state(game_state, timeout_start, timeout,
+                                        self.mean_or_lcb, self.game_type, self.game_map, self.hazard_damage)
+        action = min_max_tree_search(self.search_tree, timeout_start, timeout, self.tree_min_depth, self.tree_max_depth,
+                                     self.tree_iterations_per_depth, self.discounting_factor, self.mean_or_lcb, self.game_type, self.game_map, self.hazard_damage)
+        print(f"action: {action}")
         return {"move": action}

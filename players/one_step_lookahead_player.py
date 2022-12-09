@@ -6,7 +6,7 @@ from heuristic_baseline_functions.state_reward_heuristic import state_reward
 
 class OneStepLookaheadPlayer():
 
-    def __init__(self, params):
+    def __init__(self, params, game_type, game_map, hazard_damage):
         self.rewards = {
             'death': -1000,
             'death_by_head_collision': -700,
@@ -15,6 +15,9 @@ class OneStepLookaheadPlayer():
             'distance_to_food_when_small': -1,
             'board_domination': 2
         }
+        self.game_type = game_type
+        self.game_map = game_map
+        self.hazard_damage = hazard_damage
 
     def info(self):
         return {
@@ -31,9 +34,9 @@ class OneStepLookaheadPlayer():
 
         #print('turn ', game_state['turn'])
         #print(game_state)
-        game_state = transform_state(game_state)
+        game_state = transform_state(game_state, self.game_type, self.game_map, self.hazard_damage)
         #print(game_state)
-        action_values = sample_best_minmax_action(game_state, self.rewards)
+        action_values = sample_best_minmax_action(game_state, self.rewards, self.game_type, self.game_map, self.hazard_damage)
 
         next_move = sorted(
             action_values, key=action_values.get, reverse=True)[0]

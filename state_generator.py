@@ -1,20 +1,15 @@
 import copy
+from RL_state_reward import is_dead
 
 
-def next_state_for_action(game_state, snake_index, action):
+def next_state_for_action(game_state, snake_index, action, game_type, game_map, hazard_damage):
 
     game_state = copy.deepcopy(game_state)
     head = game_state['snake_heads'][snake_index]
     food = game_state['food']
     # move the head
-    if action == 'up':
-        next_position = (head[0], (head[1] + 1) % game_state['height'])
-    if action == 'down':
-        next_position = (head[0], (head[1] - 1) % game_state['height'])
-    if action == 'left':
-        next_position = ((head[0] - 1) % game_state['width'], head[1])
-    if action == 'right':
-        next_position = ((head[0] + 1) % game_state['width'], head[1])
+    next_position = move_head(
+        head, action, game_state['width'], game_state['height'], game_type)
 
     ate_food = False
     if next_position in food:
@@ -31,28 +26,44 @@ def next_state_for_action(game_state, snake_index, action):
         game_state['snake_bodies'][snake_index].pop(-1)
         game_state['snake_healths'][snake_index] -= 1
 
+    if next_position in game_state['hazards']:
+        game_state['snake_healths'][snake_index] -= hazard_damage
+        if game_map == 'royale' and ate_food:
+            game_state['snake_healths'][snake_index] == 100
+
     return game_state
 
 
-def cleanup_state(game_state):
+def move_head(head, action, width, height, game_type):
+    if game_type == 'wrapped':
+        if action == 'up':
+            next_position = (head[0], (head[1] + 1) % height)
+        if action == 'down':
+            next_position = (head[0], (head[1] - 1) % height)
+        if action == 'left':
+            next_position = ((head[0] - 1) % width, head[1])
+        if action == 'right':
+            next_position = ((head[0] + 1) % width, head[1])
+    if game_type == 'standard':
+        if action == 'up':
+            next_position = (head[0], head[1] + 1)
+        if action == 'down':
+            next_position = (head[0], head[1] - 1)
+        if action == 'left':
+            next_position = (head[0] - 1, head[1])
+        if action == 'right':
+            next_position = (head[0] + 1, head[1])
+    return next_position
+
+
+def cleanup_state(game_state, game_type, game_map, hazard_damage):
     dead_snakes = set()
     snake_bodies = []
     for body in game_state['snake_bodies']:
         snake_bodies += body
     snake_heads = game_state['snake_heads']
     for snake_index, head in enumerate(snake_heads):
-        if head in game_state['hazards'] or head in snake_bodies:
-            dead_snakes.add(snake_index)
-
-        # collision of snakes
-        for snake_index2, head2 in enumerate(snake_heads):
-            if snake_index != snake_index2 and head == head2:
-                if game_state['snake_lengths'][snake_index] <= game_state['snake_lengths'][snake_index2]:
-                    dead_snakes.add(snake_index)
-                if game_state['snake_lengths'][snake_index] >= game_state['snake_lengths'][snake_index2]:
-                    dead_snakes.add(snake_index2)
-
-        if game_state['snake_healths'][snake_index] <= 0:
+        if is_dead(game_state, snake_index, game_type, game_map, hazard_damage)[0]:
             dead_snakes.add(snake_index)
 
         # remove eaten food from the game state
@@ -69,7 +80,7 @@ def cleanup_state(game_state):
     return game_state
 
 
-def get_likely_moves(game_state, snake_index):
+def get_likely_moves(game_state, snake_index, game_type, game_map, hazard_damage):
     # get moves that are likely to happen (exclude self-destructing moves)
     # snake bodies except tails because the tails may move
     snake_bodies = []
@@ -80,9 +91,10 @@ def get_likely_moves(game_state, snake_index):
     good_moves_left = False
     for possible_move in possible_moves:
         next_state = next_state_for_action(
-            game_state, snake_index, possible_move)
-        # if the snake is in the wall
-        if next_state['snake_heads'][snake_index] not in next_state['hazards']:
+            game_state, snake_index, possible_move, game_type, game_map, hazard_damage)
+        # if the snake is not hazard is hazard damage is deadly
+        # or the snake did not run into a wall is the game is standard
+        if (hazard_damage >= 100 and next_state['snake_heads'][snake_index] not in next_state['hazards']) or (game_type == 'standard' and next_state['snake_heads'][snake_index][0] >= 0 and next_state['snake_heads'][snake_index][0] < next_state['width'] and next_state['snake_heads'][snake_index][1] >= 0 and next_state['snake_heads'][snake_index][1] < next_state['height']):
             # and not in the body of another snake except tail
             if next_state['snake_heads'][snake_index] not in snake_bodies:
                 likely_moves.append(possible_move)
@@ -92,7 +104,7 @@ def get_likely_moves(game_state, snake_index):
     return likely_moves
 
 
-def transform_state(game_state):
+def transform_state(game_state, game_type, game_map, hazard_damage):
     # transform game state to a flatter format
     transformed_state = {}
     transformed_state['height'] = game_state['board']['height']
