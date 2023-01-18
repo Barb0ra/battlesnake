@@ -1,5 +1,5 @@
 import copy
-from RL_state_reward import is_dead
+from bayesian_snake_logic.RL_state_reward import is_dead
 
 
 def next_state_for_action(game_state, snake_index, action, game_type, game_map, hazard_damage):

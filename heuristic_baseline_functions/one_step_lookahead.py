@@ -2,7 +2,7 @@ import itertools
 import copy
 from heuristic_baseline_functions.state_reward_heuristic import state_reward
 from heuristic_baseline_functions.state_value import state_value_deterministic
-from state_generator import next_state_for_action
+from bayesian_snake_logic.state_generator import next_state_for_action
 
 
 def sample_best_minmax_action(game_state, rewards, game_type, game_map, hazard_damage):

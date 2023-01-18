@@ -1,8 +1,8 @@
 import random
 import typing
-from RL_state_reward import is_dead
+from bayesian_snake_logic.RL_state_reward import is_dead
 
-from state_generator import next_state_for_action
+from bayesian_snake_logic.state_generator import next_state_for_action
 
 
 def state_reward(game_state, rewards, game_type, game_map, hazard_damage):

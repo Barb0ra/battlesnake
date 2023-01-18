@@ -1,5 +1,5 @@
 import random
-from state_generator import next_state_for_action, transform_state
+from bayesian_snake_logic.state_generator import next_state_for_action, transform_state
 from heuristic_baseline_functions.state_reward_heuristic import state_reward
 
 

@@ -25,7 +25,11 @@ def end(game_state: typing.Dict):
     print("GAME OVER\n")
 
 
-def run_server(port, player_name, params, game_type = 'wrapped', game_map = 'islands_and_bridges', hazard_damage = 100):
+def shutdown():
+    raise RuntimeError("Server going down")
+
+
+def run_server(port, player_name, params, game_type='wrapped', game_map='islands_and_bridges', hazard_damage=100):
     players = {
         'tree_search': TreeSearchPlayer,
         'random': RandomPlayer,
@@ -40,6 +44,7 @@ def run_server(port, player_name, params, game_type = 'wrapped', game_map = 'isl
         "move": player.move,
         "end": end
     }
+
     app = Flask("Battlesnake")
 
     @app.get("/")
@@ -69,6 +74,11 @@ def run_server(port, player_name, params, game_type = 'wrapped', game_map = 'isl
             "server", "battlesnake/github/starter-snake-python"
         )
         return response
+
+    @app.route("/shutdown", methods=["POST", "GET"])
+    def shutdown_server():
+        shutdown()
+        return "Server shutting down..."
 
     host = "0.0.0.0"
     port = int(os.environ.get("PORT", port))
