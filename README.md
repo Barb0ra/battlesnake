@@ -1,41 +1,31 @@
+# Bayesian Reinforcement Learning for Battlesnake
+Welcome to Barbora's level 4 project about Bayesian Reinforcement Learning for Battlesnake!
 
-## Run Your Battlesnake
+Find out more about Battlesnake at https://play.battlesnake.com/
 
-Install dependencies using pip
+This repository contains code for a Battlesnake AI that uses Bayesian Reinforcement Learning to learn the best strategy for the game. Using the provided infrastructure, you can host a battlesnake server, simulate games locally using diffent baseline player combinations, run experiments, and train a new value function.
 
-```sh
-pip install -r requirements.txt
+## Directory structure
+
+* `bayesian_snake_logic/` - contains the code necessary for the Bayesian player, such as the tree search, the value function, the future state generator, and feature computation.
+* `heuristic_baseline_function/` - contains the logic necessary to make the baseline players work.
+* `players/` - contains the classes for the different players. There are four different baseline players (refer to the dissertation for a description of each), and the Bayesian player in `tree_search_player.py`.
+* `server.py` - is the Flask server used when launching battlesnake players.
+* `learning/` - contains everything assonciated with local game simulation and value function training. It also contains the best trained model (Gaussian process with a linear kernel) for the value function.
+
+## Run instructions
+
+To launch a Bayesian player with the best possible parameters and value function on http://localhost:8000, simply run `python main.py`. The server will load the GP value function and be ready to receive requests.
+
+For detailed information of how to change parameter values, launch baseline players, and simulate games, refer to `manual.md`
+
+
+
+## Requirements
+
 ```
-
-Start your Battlesnake
-
-```sh
-python main.py
-```
-
-You should see the following output once it is running
-
-```sh
-Running your Battlesnake at http://0.0.0.0:8000
- * Serving Flask app 'My Battlesnake'
- * Debug mode: off
-```
-
-Open [localhost:8000](http://localhost:8000) in your browser and you should see
-
-```json
-{"apiversion":"1","author":"","color":"#888888","head":"default","tail":"default"}
-```
-
-## Play a Game Locally
-
-Install the [Battlesnake CLI](https://github.com/BattlesnakeOfficial/rules/tree/main/cli)
-* You can [download compiled binaries here](https://github.com/BattlesnakeOfficial/rules/releases)
-* or [install as a go package](https://github.com/BattlesnakeOfficial/rules/tree/main/cli#installation) (requires Go 1.18 or higher)
-
-Command to run a local game
-
-```sh
-battlesnake play -W 11 -H 11 --name 'Python Starter Project' --url http://localhost:8000 -g solo --browser
+* Python 3.7
+* Packages: listed in `requirements.txt` 
+* go 1.10.7 (if you want to simulate games locally)
 ```
 

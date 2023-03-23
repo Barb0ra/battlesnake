@@ -4,6 +4,7 @@ import multiprocessing
 
 from server import run_server
 
+# example snakes dictionary
 snakes = [{'name': 'Bayesian', 'type': 'tree_search', 'port': 8000, 'params': [2, 8, 6, 0.9, 'lcb',
                                                                                False, 'basic']}, {'name': 'Baseline', 'type': 'one_step_lookahead', 'port': 8080, 'params': []}]
 
