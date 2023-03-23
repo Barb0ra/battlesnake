@@ -11,7 +11,6 @@ from players.self_preserving_player import SelfPreservingPlayer
 from players.tree_search_player import TreeSearchPlayer
 from players.one_step_lookahead_player import OneStepLookaheadPlayer
 
-# start is called when your Battlesnake begins a game
 
 
 def start(game_state: typing.Dict, player, player_name):
@@ -20,13 +19,8 @@ def start(game_state: typing.Dict, player, player_name):
         player.search_tree.root_state = None
 
 
-# end is called when your Battlesnake finishes a game
 def end(game_state: typing.Dict):
     print("GAME OVER\n")
-
-
-def shutdown():
-    raise RuntimeError("Server going down")
 
 
 def run_server(port, player_name, params, game_type='wrapped', game_map='islands_and_bridges', hazard_damage=100):
@@ -74,11 +68,6 @@ def run_server(port, player_name, params, game_type='wrapped', game_map='islands
             "server", "battlesnake/github/starter-snake-python"
         )
         return response
-
-    @app.route("/shutdown", methods=["POST", "GET"])
-    def shutdown_server():
-        shutdown()
-        return "Server shutting down..."
 
     host = "0.0.0.0"
     port = int(os.environ.get("PORT", port))

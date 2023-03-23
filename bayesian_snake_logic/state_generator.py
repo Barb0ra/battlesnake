@@ -5,6 +5,7 @@ from bayesian_snake_logic.RL_state_reward import is_dead
 def next_state_for_action(game_state, snake_index, action, game_type, game_map, hazard_damage):
 
     game_state = copy.deepcopy(game_state)
+    game_state['turn'] += 1
     head = game_state['snake_heads'][snake_index]
     food = game_state['food']
     # move the head
@@ -107,6 +108,7 @@ def get_likely_moves(game_state, snake_index, game_type, game_map, hazard_damage
 def transform_state(game_state, game_type, game_map, hazard_damage):
     # transform game state to a flatter format
     transformed_state = {}
+    transformed_state['turn'] = game_state['turn']
     transformed_state['height'] = game_state['board']['height']
     transformed_state['width'] = game_state['board']['width']
     transformed_state['food'] = set()

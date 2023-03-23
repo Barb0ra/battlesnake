@@ -63,6 +63,8 @@ class SearchTree:
                 if equal_states(state.game_state, game_state):
                     self.root_state = state
                     self.root_state.game_state = game_state
+                    # increase the turn number in feature vector
+                    self.root_state.feature_vector[-1] += 1
                     existing_state = True
                     break
             if not existing_state:
@@ -85,6 +87,8 @@ class ActionNode:
         min_state = None
         for state in self.states:
             sample_value = state.get_sample_value()
+            # or in a non-bayesian case
+            #sample_value = state.mean
             if min == None or sample_value < min:
                 min = sample_value
                 min_state = state
@@ -102,12 +106,14 @@ class ActionNode:
         return min, min_state
 
     def get_state_with_min_lcb(self):
-        min = None
+        min_lcb = None
         min_state = None
         min_ucb = None
+        all_lcbs = []
         for state in self.states:
             value = state.mean - 2*(state.variance)**0.5
-            if min == None or value < min:
+            all_lcbs.append(value)
+            if min_lcb == None or value < min_lcb:
                 min_lcb = value
                 min_state = state
                 min_ucb = state.mean + 2*(state.variance)**0.5
@@ -122,7 +128,6 @@ class ActionNode:
 class StateNode:
 
     def __init__(self, game_state, game_type, game_map, hazard_damage, value_function, parent=None):
-
         self.n_visited = 1
         self.parent_action = parent
         self.reward = state_reward(
@@ -224,20 +229,17 @@ def min_max_tree_search(search_tree, timeout_start, timeout, tree_min_depth, tre
         if iteration_counter >= tree_iterations_per_depth:
             iteration_counter = 0
             depth += 1
-    # print('actions')
-    # for action in root_state.actions:
-    #    print(action.action)
-    #    for state in action.states:
-    #        print(state.mean, state.variance)
+
     if log_state_values:
         log_state_value(root_state)
-    print(depth)
-    return root_state.get_max_action(timeout_start, timeout, mean_or_lcb, game_type, game_map, hazard_damage, value_function).action
+    action = root_state.get_max_action(
+        timeout_start, timeout, mean_or_lcb, game_type, game_map, hazard_damage, value_function).action
+    return action
 
 
 def update_state_nodes(state, depth, alpha, accumulated_reward, timeout_start, timeout, game_type, game_map, hazard_damage, value_function):
     if depth == 0 or state.terminal or time.time() > timeout_start + timeout:
-        return state.mean + accumulated_reward
+        return state.get_sample_value() + accumulated_reward
     max_action, min_state = state.sample_max_action(
         timeout_start, timeout, game_type, game_map, hazard_damage, value_function)
     min_state_value = update_state_nodes(
