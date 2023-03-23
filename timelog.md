@@ -221,7 +221,7 @@
 * *0.5 hours* analysis of the results
 * *0.5 hours* supervisor meeting
 
-### Week 17
+## Week 17
 
 ### 01 Feb 2023
 * *5 hours* value function training and analysis
@@ -232,7 +232,7 @@
 ### 03 Feb 2023
 * *0.5 hours* supervisor meeting
 
-### Week 19
+## Week 19
 
 ### 06 Feb 2023
 * *2 hours* Background section writing
@@ -248,7 +248,7 @@
 ### 10 Feb 2023
 * *0.5 hours* supervisor meeting
 
-### Week 20
+## Week 20
 
 ### 13 Feb 2023
 * *4 hours* Background section writing
@@ -260,7 +260,7 @@
 ### 17 Feb 2023
 * *0.5 hours* supervisor meeting
 
-### Week 21
+## Week 21
 
 ### 20 Feb 2023
 * *2 hours* Trying the linear kernel for the value function, evaluation
@@ -274,7 +274,7 @@
 ### 24 Feb 2023
 * *0.5 hours* supervisor meeting
 
-### Week 22
+## Week 22
 
 ### 27 Feb 2023
 * *2 hours* Experiment coding and running
@@ -288,7 +288,7 @@
 ### 03 Mar 2023
 * *0.5 hours* supervisor meeting
 
-### Week 23
+## Week 23
 
 ### 06 Mar 2023
 * *2 hours* Background section writing
@@ -305,7 +305,7 @@
 ### 10 Mar 2023
 * *0.5 hours* supervisor meeting
 
-### Week 24
+## Week 24
 
 ### 13 Mar 2023
 * *3 hours* Evaluation writing
@@ -316,7 +316,7 @@
 ### 19 Mar 2023
 * *6 hours* Implementation writing
 
-### Week 25
+## Week 25
 
 ### 20 Mar 2023
 * *3 hours* abstract, conclusion writing
